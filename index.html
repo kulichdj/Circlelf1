@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circle lf</title>
+    
+    <!-- ИКОНКА ДЛЯ РАБОЧЕГО СТОЛА СМАРТФОНА -->
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/mD3fR00n/rpg-life-icon.png">
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/mD3fR00n/rpg-life-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Circle lf">
+
+    <style>
+        :root {
+            /* ТЁМНАЯ ТЕМА — УЛЬТРАГЛАСС */
+            --bg-color: #0b0c10;
+            --panel-bg: linear-gradient(135deg, rgba(35, 37, 49, 0.45) 0%, rgba(15, 16, 22, 0.65) 100%);
+            --border-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(255, 255, 255, 0.12) 100%);
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+            --accent-color: #ffffff;
+            --accent-glow: rgba(255, 255, 255, 0.25);
+            --circle-bg: rgba(255, 255, 255, 0.04);
+            --shadow: 0 24px 60px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255,255,255,0.15);
+            --input-bg: rgba(0, 0, 0, 0.25);
+            --ring-gradient-start: #ffffff;
+            --ring-gradient-end: #71717a;
+            --radial-1: radial-gradient(circle at 15% 15%, rgba(120, 119, 198, 0.22) 0%, transparent 60%);
+            --radial-2: radial-gradient(circle at 85% 85%, rgba(244, 114, 182, 0.12) 0%, transparent 60%);
+            --cal-active: #ffffff;
+            --cal-active-text: #0b0c10;
+        }
+
+        body.light-theme {
+            /* СВЕТЛАЯ ТЕМА — ОПАЛОВОЕ СТЕКЛО */
+            --bg-color: #f0f2f6;
+            --panel-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.75) 0%, rgba(240, 242, 245, 0.5) 100%);
+            --border-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(0, 0, 0, 0.04) 50%, rgba(0, 0, 0, 0.1) 100%);
+            --text-main: #1c1c1e;
+            --text-muted: #71717a;
+            --accent-color: #1c1c1e;
+            --accent-glow: rgba(0, 0, 0, 0.05);
+            --circle-bg: rgba(0, 0, 0, 0.04);
+            --shadow: 0 20px 50px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255,255,255,0.6);
+            --input-bg: rgba(255, 255, 255, 0.5);
+            --ring-gradient-start: #1c1c1e;
+            --ring-gradient-end: #a1a1aa;
+            --radial-1: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);
+            --radial-2: radial-gradient(circle at 90% 80%, rgba(244, 114, 182, 0.06) 0%, transparent 50%);
+            --cal-active: #1c1c1e;
+            --cal-active-text: #ffffff;
+        }
+
+        * { box-sizing: border-box; outline: none; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            background-image: var(--radial-1), var(--radial-2);
+            background-attachment: fixed;
+            color: var(--text-main);
+            padding: 30px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            transition: background-color 0.5s ease, color 0.4s ease;
+        }
+
+        /* ВСТУПИТЕЛЬНЫЙ ЭКРАН (SPLASH SCREEN) */
+        .splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0b0c10; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 9999;
+            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.5s;
+        }
+        .splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        
+        .splash-logo-container {
+            position: relative; width: 140px; height: 140px;
+            display: flex; justify-content: center; align-items: center;
+            margin-bottom: 25px;
+        }
+        .splash-ring {
+            position: absolute; width: 100%; height: 100%;
+            border-radius: 50%; border: 4px solid rgba(255,255,255,0.04);
+            border-top-color: #ffffff;
+            animation: spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+        .splash-text {
+            font-size: 2.2rem; font-weight: 100; letter-spacing: 6px;
+            color: #ffffff; animation: pulse 1.5s ease-in-out infinite;
+            text-transform: uppercase;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 0.6; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1); } }
+
+        /* ИНТЕРФЕЙС */
+        .app-container { width: 100%; max-width: 440px; z-index: 1; position: relative; }
+        .theme-switcher { width: 100%; max-width: 440px; display: flex; justify-content: flex-end; margin-bottom: 20px; }
+
+        .toggle-style-btn, .action-btn {
+            background: var(--panel-bg); color: var(--text-main); padding: 10px 16px; border-radius: 30px; font-size: 0.8rem;
+            cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 500; box-shadow: var(--shadow);
+            border: 1px solid transparent; position: relative; backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+        }
+        .toggle-style-btn::before, .glass-panel::before, .action-btn::before, .ach-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: inherit; padding: 1px;
+            background: var(--border-gradient); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
+        }
+
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+        .action-btn { width: 100%; justify-content: center; font-size: 0.85rem; padding: 14px; border-radius: 16px; margin-bottom: 0; }
+
+        .glass-panel { background: var(--panel-bg); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px); border-radius: 28px; box-shadow: var(--shadow); padding: 24px; margin-bottom: 24px; position: relative; }
+        .hero-stats { display: flex; align-items: center; gap: 24px; }
+        .main-circle-container { position: relative; width: 115px; height: 115px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
+        .progress-ring { transform: rotate(-90deg); }
+        .circle-bg { fill: none; stroke: var(--circle-bg); stroke-width: 5; }
+        
+        .main-circle-progress {
+            fill: none; stroke: url(#ring-gradient); stroke-width: 5; stroke-linecap: round;
+            stroke-dasharray: 326.72; stroke-dashoffset: 326.72; transition: stroke-dashoffset 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .main-level-number { position: absolute; font-size: 2.8rem; font-weight: 100; color: var(--text-main); letter-spacing: -1px; }
+        .main-text-stats { flex-grow: 1; }
+        .stat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 3px; }
+        .stat-value { font-size: 1.25rem; font-weight: 400; margin-bottom: 4px; }
+
+        .spheres-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .sphere-card { background: var(--panel-bg); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; box-shadow: var(--shadow); }
+        .sphere-card::before { content: ''; position: absolute; top:0; left:0; right:0; bottom:0; border-radius: inherit; padding: 1px; background: var(--border-gradient); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+        .sphere-circle-container { position: relative; width: 70px; height: 70px; display: flex; justify-content: center; align-items: center; margin-bottom: 8px; }
+        
+        .sphere-circle-progress {
+            fill: none; stroke: url(#ring-gradient); stroke-width: 4; stroke-linecap: round;
+            stroke-dasharray: 201.06; stroke-dashoffset: 201.06; transition: stroke-dashoffset 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); opacity: 0.9;
+        }
+
+        .sphere-level { position: absolute; font-size: 1.25rem; font-weight: 300; }
+        .sphere-name-input { background: transparent; border: none; color: var(--text-main); font-size: 0.85rem; text-align: center; width: 100%; font-weight: 400; letter-spacing: 0.3px; padding: 2px; border-bottom: 1px solid transparent; cursor: pointer; transition: color 0.3s; }
+        .sphere-name-input:focus { border-bottom: 1px solid var(--text-main); cursor: text; }
+        .sphere-xp-text { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; }
+
+        .credits-footer {
+            text-align: center; font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 2px; color: var(--text-muted); opacity: 0.35; margin-top: 10px;
+            margin-bottom: 20px; pointer-events: none;
+        }
+
+        h2 { font-weight: 300; font-size: 1.15rem; letter-spacing: 0.5px; margin-bottom: 16px; }
+        h3 { font-weight: 400; font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
+
+        .input-group { display: flex; flex-direction: column; gap: 12px; }
+        input, select { padding: 14px 16px; background: var(--input-bg); border: 1px solid transparent; border-radius: 16px; font-size: 0.95rem; color: var(--text-main); transition: all 0.25s; }
+        input:focus, select:focus { border-color: rgba(255, 255, 255, 0.15); }
+        input::placeholder { color: #555; }
+        body.light-theme input::placeholder { color: #b5b5b7; }
+        select option { background-color: var(--bg-color); color: var(--text-main); }
+
+        button.main-btn { background-color: var(--accent-color); color: var(--bg-color); border: none; padding: 15px; border-radius: 16px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
+        button.main-btn:active { transform: scale(0.98); }
+
+        .quest-item { background: var(--panel-bg); border-radius: 20px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); position: relative; }
+        .quest-item::before { content: ''; position: absolute; top:0; left:0; right:0; bottom:0; border-radius: inherit; padding: 1px; background: var(--border-gradient); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+        .quest-title { font-weight: 400; font-size: 1rem; margin-bottom: 4px; }
+        
+        .quest-tag {
+            display: inline-block; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;
+            background: var(--circle-bg); padding: 2px 8px; border-radius: 8px; color: var(--text-muted); margin-top: 2px;
+        }
+        .quest-date-tag {
+            display: inline-block; font-size: 0.65rem; letter-spacing: 0.3px; background: rgba(120, 119, 198, 0.2); padding: 2px 8px; border-radius: 8px; color: var(--text-main); margin-top: 2px; margin-left: 4px;
+        }
+
+        .action-wrapper { position: relative; display: flex; align-items: center; }
+        button.check-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.12); background: transparent; cursor: pointer; display: flex; justify-content: center; align-items: center; color: var(--text-main); }
+        body.light-theme button.check-btn { border-color: rgba(0,0,0,0.12); }
+
+        .confirm-popup { position: absolute; right: 0; background: var(--text-main); padding: 4px; border-radius: 20px; display: flex; gap: 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); opacity: 0; pointer-events: none; transform: scale(0.8) translateX(10px); transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10; }
+        .confirm-popup.active { opacity: 1; pointer-events: auto; transform: scale(1) translateX(0); }
+        .confirm-btn { border: none; padding: 6px 14px; border-radius: 16px; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+        .confirm-btn.yes { background: var(--bg-color); color: var(--text-main); }
+        .confirm-btn.no { background: transparent; color: var(--bg-color); }
+        body.light-theme .confirm-btn.no { color: #ffffff; }
+        .quest-item.fade-out { opacity: 0; transform: scale(0.9) translateY(-10px); }
+
+        /* --- МОДАЛЬНЫЕ ОКНА --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-box { background: var(--panel-bg); color: var(--text-main); padding: 30px; border-radius: 24px; text-align: center; max-width: 350px; width: 85%; transform: scale(0.8); transition: transform 0.3s; position: relative; box-shadow: var(--shadow); }
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-box h4 { font-size: 1.3rem; margin-bottom: 8px; font-weight: 500; }
+        .modal-box p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+        .modal-box button { background: var(--text-main); color: var(--bg-color); border: none; padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; }
+        
+        .close-ach-btn { background: var(--text-main); color: var(--bg-color); border: none; padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; margin-top: auto; }
+
+        .ach-box { max-width: 420px; height: 80vh; display: flex; flex-direction: column; text-align: left; padding: 24px; }
+        .ach-list-scroll { flex-grow: 1; overflow-y: auto; margin: 16px 0; padding-right: 4px; display: flex; flex-direction: column; gap: 12px; }
+        .ach-list-scroll::-webkit-scrollbar { width: 4px; }
+        .ach-list-scroll::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        .ach-card { display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: rgba(0,0,0,0.1); border-radius: 18px; position: relative; transition: all 0.4s; }
+        .ach-card.unlocked { background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%); }
+        body.light-theme .ach-card.unlocked { background: linear-gradient(135deg, rgba(0,0,0,0.03) 0%, rgba(0,0,0,0.01) 100%); }
+        .ach-icon-box { font-size: 1.6rem; filter: grayscale(1); opacity: 0.2; transition: all 0.4s; }
+        .ach-card.unlocked .ach-icon-box { filter: grayscale(0); opacity: 1; transform: scale(1.05); }
+        .ach-info-box { flex-grow: 1; }
+        .ach-title-text { font-size: 0.9rem; font-weight: 600; opacity: 0.4; transition: opacity 0.3s; }
+        .ach-card.unlocked .ach-title-text { opacity: 1; }
+        .ach-desc-text { font-size: 0.75rem; color: var(--text-muted); margin-top: 1px; }
+
+        /* --- КАЛЕНДАРЬ СТИЛЬ --- */
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-weight: 500; }
+        .cal-nav-btn { background: transparent; border: none; color: var(--text-main); font-size: 1.1rem; cursor: pointer; padding: 0 10px; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
+        .cal-day-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
+        .cal-cell { aspect-ratio: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 0.85rem; border-radius: 50%; cursor: pointer; position: relative; transition: all 0.2s; }
+        .cal-cell:hover { background: var(--circle-bg); }
+        .cal-cell.has-tasks::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; background: rgba(120, 119, 198, 0.8); border-radius: 50%; }
+        body.light-theme .cal-cell.has-tasks::after { background: rgba(0, 0, 0, 0.4); }
+        .cal-cell.selected { background: var(--cal-active) !important; color: var(--cal-active-text) !important; font-weight: 600; }
+        .cal-cell.empty { pointer-events: none; opacity: 0; }
+    </style>
+</head>
+<body>
+
+    <!-- ВСТУПИТЕЛЬНЫЙ ЭКРАН -->
+    <div class="splash-screen" id="splash-layer">
+        <div class="splash-logo-container">
+            <div class="splash-ring"></div>
+            <div style="font-size: 1.6rem; font-weight: 200;">Circle</div>
+        </div>
+        <div class="splash-text">lf</div>
+    </div>
+
+    <svg width="0" height="0" style="position: absolute;">
+        <defs>
+            <linearGradient id="ring-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="var(--ring-gradient-start)" />
+                <stop offset="100%" stop-color="var(--ring-gradient-end)" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <div class="theme-switcher">
+        <button class="toggle-style-btn" onclick="toggleTheme()">
+            <span id="theme-btn-icon">☀️</span> <span id="theme-btn-text">Светлая тема</span>
+        </button>
+    </div>
+
+    <div class="app-container">
+
+        <!-- ОБЩИЙ УРОВЕНЬ -->
+        <div class="glass-panel hero-stats">
+            <div class="main-circle-container">
+                <svg class="progress-ring" width="115" height="115">
+                    <circle class="circle-bg" cx="57.5" cy="55" r="52"/>
+                    <circle class="main-circle-progress" id="main-xp-circle" cx="57.5" cy="55" r="52"/>
+                </svg>
+                <div class="main-level-number" id="main-level">0</div>
+            </div>
+            <div class="main-text-stats">
+                <div class="stat-label">Ранг аккаунта</div>
+                <div class="stat-value" style="font-size: 1.2rem; font-weight: 300;" id="main-sphere-status">Новичок</div>
+                <div class="stat-label">Прогресс ядра</div>
+                <div id="main-xp-text" style="font-size: 0.8rem; color: var(--text-muted);">0 / 100 XP</div>
+            </div>
+        </div>
+
+        <!-- 4 СФЕРЫ ПРОКАЧКИ -->
+        <div class="spheres-grid">
+            <div class="sphere-card">
+                <div class="sphere-circle-container">
+                    <svg class="progress-ring" width="70" height="70">
+                        <circle class="circle-bg" cx="35" cy="35" r="32"/>
+                        <circle class="sphere-circle-progress" id="sphere-circle-0" cx="35" cy="35" r="32"/>
+                    </svg>
+                    <div class="sphere-level" id="sphere-lvl-0">0</div>
+                </div>
+                <input type="text" class="sphere-name-input" id="sphere-name-0" onchange="saveSphereNames()" value="Работа">
+                <div class="sphere-xp-text" id="sphere-xp-0">0/100 XP</div>
+            </div>
+            <div class="sphere-card">
+                <div class="sphere-circle-container">
+                    <svg class="progress-ring" width="70" height="70">
+                        <circle class="circle-bg" cx="35" cy="35" r="32"/>
+                        <circle class="sphere-circle-progress" id="sphere-circle-1" cx="35" cy="35" r="32"/>
+                    </svg>
+                    <div class="sphere-level" id="sphere-lvl-1">0</div>
+                </div>
+                <input type="text" class="sphere-name-input" id="sphere-name-1" onchange="saveSphereNames()" value="Хобби">
+                <div class="sphere-xp-text" id="sphere-xp-1">0/100 XP</div>
+            </div>
+            <div class="sphere-card">
+                <div class="sphere-circle-container">
+                    <svg class="progress-ring" width="70" height="70">
+                        <circle class="circle-bg" cx="35" cy="35" r="32"/>
+                        <circle class="sphere-circle-progress" id="sphere-circle-2" cx="35" cy="35" r="32"/>
+                    </svg>
+                    <div class="sphere-level" id="sphere-lvl-2">0</div>
+                </div>
+                <input type="text" class="sphere-name-input" id="sphere-name-2" onchange="saveSphereNames()" value="Отдых">
+                <div class="sphere-xp-text" id="sphere-xp-2">0/100 XP</div>
+            </div>
+            <div class="sphere-card">
+                <div class="sphere-circle-container">
+                    <svg class="progress-ring" width="70" height="70">
+                        <circle class="circle-bg" cx="35" cy="35" r="32"/>
+                        <circle class="sphere-circle-progress" id="sphere-circle-3" cx="35" cy="35" r="32"/>
+                    </svg>
+                    <div class="sphere-level" id="sphere-lvl-3">0</div>
+                </div>
+                <input type="text" class="sphere-name-input" id="sphere-name-3" onchange="saveSphereNames()" value="Спорт">
+                <div class="sphere-xp-text" id="sphere-xp-3">0/100 XP</div>
+            </div>
+        </div>
+
+        <!-- КНОПКИ ДЕЙСТВИЙ (СЕТКА) -->
+        <div class="action-grid">
+            <button class="action-btn" onclick="openCalModal()">📅 Календарь целей</button>
+            <button class="action-btn" onclick="openAchModal()">🏆 Достижения</button>
+        </div>
+
+        <!-- ТАСК МЕНЕДЖЕР -->
+        <div class="glass-panel">
+            <h2 id="form-title">Новая цель</h2>
+            <div class="input-group">
+                <input type="text" id="quest-input" placeholder="Что нужно сделать?">
+                <select id="quest-sphere">
+                    <option value="0" id="opt-0">Работа</option>
+                    <option value="1" id="opt-1">Хобби</option>
+                    <option value="2" id="opt-2">Отдых</option>
+                    <option value="3" id="opt-3">Спорт</option>
+                </select>
+                <select id="quest-difficulty">
+                    <option value="easy">Малый фокус (+20 XP)</option>
+                    <option value="medium" selected>Стандартная цель (+50 XP)</option>
+                    <option value="hard">Тяжелый вызов (+100 XP)</option>
+                </select>
+                <button class="main-btn" onclick="addQuest()">Добавить задачу</button>
+            </div>
+        </div>
+
+        <!-- СПИСОК ЗАДАЧ -->
+        <div class="quests-container">
+            <h3 id="quests-header-text">Активные цели</h3>
+            <div id="quests-list"></div>
+        </div>
+        
+        <div class="credits-footer">by KULISINSKIY</div>
+
+    </div>
+
+    <!-- МОДАЛЬНЫЕ ОКНА -->
+    <div class="modal-overlay" id="ach-modal">
+        <div class="modal-box ach-box">
+            <h4>Свиток достижений</h4>
+            <div class="ach-list-scroll" id="ach-list-container"></div>
+            <button class="close-ach-btn" onclick="closeAchModal()">Вернуться к целям</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="cal-modal">
+        <div class="modal-box" style="max-width: 400px; width: 90%;">
+            <div class="cal-header">
+                <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+                <span id="cal-month-title"></span>
+                <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+            </div>
+            <div class="cal-grid" id="cal-grid-container"></div>
+            <button class="close-ach-btn" onclick="closeCalModal()" style="margin-top: 20px;">Выбрать дату</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="levelup-modal">
+        <div class="modal-box">
+            <h4 id="modal-title">Новый уровень!</h4>
+            <p id="modal-desc">Вы успешно продвинулись вперед.</p>
+            <button onclick="closeModal()">Продолжить</button>
+        </div>
+    </div>
+
+    <script>
+        // ГАРАНТИРОВАННОЕ СКРЫТИЕ ЗАСТАВКИ ЧЕРЕЗ 1.5 СЕКУНДЫ
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splash-layer');
+                if (splash) splash.classList.add('hidden');
+            }, 1500);
+        });
+
+        let state = JSON.parse(localStorage.getItem('rpg_glass_v2.0_state')) || {
+            mainLevel: 0,
+            mainXp: 0,
+            mainNextLevelXp: 100,
+            totalCompleted: 0,
+            easyCompleted: 0,
+            medCompleted: 0,
+            hardCompleted: 0,
+            spheres: [
+                { id: 0, name: "Работа", level: 0, xp: 0, nextXp: 100 },
+                { id: 1, name: "Хобби", level: 0, xp: 0, nextXp: 100 },
+                { id: 2, name: "Отдых", level: 0, xp: 0, nextXp: 100 },
+                { id: 3, name: "Спорт", level: 0, xp: 0, nextXp: 100 }
+            ],
+            unlockedAchs: []
+        };
+
+        const achDatabase = [
+            { id: 0, icon: "🌱", title: "Первый триумф", desc: "Успешно закройте вашу самую первую цель" },
+            { id: 1, icon: "⚡", title: "Разгон набран", desc: "Выполните суммарно 5 любых задач" },
+            { id: 2, icon: "🔥", title: "Машина фокуса", desc: "Выполните суммарно 25 задач" },
+            { id: 3, icon: "💎", title: "Эрудит", desc: "Выполните 10 стандартных целей" },
+            { id: 4, icon: "⚔️", title: "Сокрушитель преград", desc: "Одолейте 3 тяжелых вызова (+100 XP)" },
+            { id: 5, icon: "🛡️", title: "Герой титана", desc: "Одолейте 10 тяжелых вызовов" },
+            { id: 6, icon: "🌟", title: "Новая ступень", desc: "Прокачайте любую сферу до 3 уровня" },
+            { id: 7, icon: "🌌", title: "Мастер грани", desc: "Прокачайте любую сферу до 5 уровня" },
+            { id: 8, icon: "🤝", title: "Баланс стихий", desc: "Поднимите абсолютно все 4 сферы до 2 уровня" },
+            { id: 9, icon: "👑", title: "Укрепление ядра", desc: "Прокачайте общий ранг аккаунта до 5 уровня" },
+            { id: 10, icon: "🔮", title: "Высший разум", desc: "Прокачайте общий ранг аккаунта до 10 уровня" },
+            { id: 11, icon: "🎨", title: "Свой путь", desc: "Переименуйте любую стандартную сферу прокачки" }
+        ];
+
+        let currentTheme = localStorage.getItem('rpg_graphite_theme_mode_v4') || 'dark';
+        if (currentTheme === 'light') { document.body.classList.add('light-theme'); }
+
+        let quests = JSON.parse(localStorage.getItem('rpg_glass_v2.0_quests')) || [];
+
+        let today = new Date();
+        let currentCalYear = today.getFullYear();
+        let currentCalMonth = today.getMonth();
+        let selectedDateStr = today.toISOString().split('T')[0];
+
+        function toggleTheme() {
+            if (document.body.classList.contains('light-theme')) {
+                document.body.classList.remove('light-theme');
+                localStorage.setItem('rpg_graphite_theme_mode_v4', 'dark');
+            } else {
+                document.body.classList.add('light-theme');
+                localStorage.setItem('rpg_graphite_theme_mode_v4', 'light');
+            }
+            updateUI();
+        }
+
+        function saveGame() {
+            localStorage.setItem('rpg_glass_v2.0_state', JSON.stringify(state));
+            localStorage.setItem('rpg_glass_v2.0_quests', JSON.stringify(quests));
+        }
+
+        function saveSphereNames() {
+            let changed = false;
+            for(let i=0; i<4; i++) {
+                let oldName = state.spheres[i].name;
+                let newName = document.getElementById(`sphere-name-${i}`).value;
+                if(oldName !== newName) {
+                    state.spheres[i].name = newName;
+                    changed = true;
+                }
+            }
+            if(changed) triggerAchievement(11);
+            saveGame();
+            updateDropdowns();
+        }
+
+        function updateDropdowns() {
+            for(let i=0; i<4; i++) {
+                const el = document.getElementById(`opt-${i}`);
+                if (el) el.innerText = state.spheres[i].name;
+            }
+        }
+
+        function setCircleProgress(elementId, radius, percent) {
+            const circle = document.getElementById(elementId);
+            if (!circle) return;
+            const circumference = 2 * Math.PI * radius;
+            circle.style.strokeDasharray = circumference + ' ' + circumference;
+            const offset = circumference - (percent / 100 * circumference);
+            circle.style.strokeDashoffset = offset;
+        }
+
+        function triggerAchievement(id) {
+            if (!state.unlockedAchs.includes(id)) {
+                state.unlockedAchs.push(id);
+                saveGame();
+                setTimeout(() => {
+                    showModal("🏆 ДОСТИЖЕНИЕ ОТКРЫТО!", `Вы разблокировали: "${achDatabase[id].title}"`);
+                }, 600);
+            }
+        }
+
+        function evaluateAchievements() {
+            if (state.totalCompleted >= 1) triggerAchievement(0);
+            if (state.totalCompleted >= 5) triggerAchievement(1);
+            if (state.totalCompleted >= 25) triggerAchievement(2);
+            if (state.medCompleted >= 10) triggerAchievement(3);
+            if (state.hardCompleted >= 3) triggerAchievement(4);
+            if (state.hardCompleted >= 10) triggerAchievement(5);
+            
+            let lvls = state.spheres.map(s => s.level);
+            if (Math.max(...lvls) >= 3) triggerAchievement(6);
+            if (Math.max(...lvls) >= 5) triggerAchievement(7);
+            if (Math.min(...lvls) >= 2) triggerAchievement(8);
+            
+            if (state.mainLevel >= 5) triggerAchievement(9);
+            if (state.mainLevel >= 10) triggerAchievement(10);
+        }
+
+        function buildAchievementsUI() {
+            const container = document.getElementById('ach-list-container');
+            if(!container) return;
+            container.innerHTML = '';
+            achDatabase.forEach(ach => {
+                const isUnlocked = state.unlockedAchs.includes(ach.id);
+                container.innerHTML += `
+                    <div class="ach-card ${isUnlocked ? 'unlocked' : ''}">
+                        <div class="ach-icon-box">${ach.icon}</div>
+                        <div class="ach-info-box">
+                            <div class="ach-title-text">${ach.title}</div>
+                            <div class="ach-desc-text">${ach.desc}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderCalendar() {
+            const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+            const titleEl = document.getElementById('cal-month-title');
+            if(titleEl) titleEl.innerText = monthNames[currentCalMonth] + " " + currentCalYear;
+            
+            const container = document.getElementById('cal-grid-container');
+            if(!container) return;
+            container.innerHTML = '';
+
+            const labels = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+            labels.forEach(l => container.innerHTML += `<div class="cal-day-label">${l}</div>`);
+
+            let firstDay = new Date(currentCalYear, currentCalMonth, 1).getDay();
+            let daysInMonth = new Date(currentCalYear, currentCalMonth + 1, 0).getDate();
+            
+            let startOffset = firstDay === 0 ? 6 : firstDay - 1;
+
+            for (let i = 0; i < startOffset; i++) {
+                container.innerHTML += `<div class="cal-cell empty"></div>`;
+            }
+
+            for (let day = 1; daysInMonth >= day; day++) {
+                let monthStr = String(currentCalMonth + 1).padStart(2, '0');
+                let dayStr = String(day).padStart(2, '0');
+                let cellDateStr = currentCalYear + "-" + monthStr + "-" + dayStr;
+
+                let hasTasks = quests.some(q => q.date === cellDateStr);
+                let isSelected = selectedDateStr === cellDateStr;
+
+                container.innerHTML += `
+                    <div class="cal-cell ${isSelected ? 'selected' : ''} ${hasTasks ? 'has-tasks' : ''}" 
+                         onclick="selectDate('${cellDateStr}')">
+                        ${day}
+                    </div>
+                `;
+            }
+        }
+
+        function changeMonth(direction) {
+            currentCalMonth += direction;
+            if (currentCalMonth > 11) { currentCalMonth = 0; currentCalYear++; }
+            if (currentCalMonth < 0) { currentCalMonth = 11; currentCalYear--; }
+            renderCalendar();
+        }
+
+        function selectDate(dateStr) {
+            selectedDateStr = dateStr;
+            renderCalendar();
+            updateUI();
+        }
+
+        function updateUI() {
+            const isLight = document.body.classList.contains('light-theme');
+            const themeBtnIcon = document.getElementById('theme-btn-icon');
+            const themeBtnText = document.getElementById('theme-btn-text');
+            if(themeBtnIcon) themeBtnIcon.innerText = isLight ? "🌙" : "☀️";
+            if(themeBtnText) themeBtnText.innerText = isLight ? "Темная тема" : "Светлая тема";
+
+            const mainLvlEl = document.getElementById('main-level');
+            const mainXpEl = document.getElementById('main-xp-text');
+            if(mainLvlEl) mainLvlEl.innerText = state.mainLevel;
+            if(mainXpEl) mainXpEl.innerText = state.mainXp + " / " + state.mainNextLevelXp + " XP";
+            
+            const mainPercent = (state.mainXp / state.mainNextLevelXp) * 100;
+            setCircleProgress('main-xp-circle', 52, mainPercent);
+
+            let status = "Новичок";
+            if(state.mainLevel >= 5) status = "Специалист";
+            if(state.mainLevel >= 10) status = "Мастер линейки";
+            if(state.mainLevel >= 20) status = "Легендарный Разум";
+            
+            const statusEl = document.getElementById('main-sphere-status');
+            if(statusEl) statusEl.innerText = status;
+
+            state.spheres.forEach((sphere, i) => {
+                const nameInp = document.getElementById(`sphere-name-${i}`);
+                const lvlEl = document.getElementById(`sphere-lvl-${i}`);
+                const xpEl = document.getElementById(`sphere-xp-${i}`);
+                
+                if(nameInp) nameInp.value = sphere.name;
+                if(lvlEl) lvlEl.innerText = sphere.level;
+                if(xpEl) xpEl.innerText = sphere.xp + "/" + sphere.nextXp + " XP";
+                
+                const spherePercent = (sphere.xp / sphere.nextXp) * 100;
+                setCircleProgress(`sphere-circle-${i}`, 32, spherePercent);
+            });
+
+            updateDropdowns();
+            evaluateAchievements();
+
+            let d = new Date(selectedDateStr);
+            let formattedDate = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+            const headerTxt = document.getElementById('quests-header-text');
+            if(headerTxt) headerTxt.innerText = "Цели на " + formattedDate;
+
+            const list = document.getElementById('quests-list');
+            if(!list) return;
+            list.innerHTML = '';
+            
+            let filteredQuests = quests.filter(q => q.date === selectedDateStr);
+
+            if(filteredQuests.length === 0) {
+                list.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 30px; font-size: 0.9rem; font-style: italic;">На этот день задач нет. Свободное время.</div>';
+            }
+
+            quests.forEach((quest, index) => {
+                if (quest.date !== selectedDateStr) return;
+
+                let rewards = "+50 XP";
+                if(quest.difficulty === 'easy') rewards = "+20 XP";
+                if(quest.difficulty === 'hard') rewards = "+100 XP";
+
+                const sphereName = state.spheres[quest.sphereId]?.name || "Сфера";
+
+                list.innerHTML += `
+                    <div class="quest-item" id="quest-${index}">
+                        <div>
+                            <div class="quest-title">${quest.text}</div>
+                            <div>
+                                <span class="quest-tag">${sphereName}</span>
+                                <span class="quest-date-tag">📅 ${formattedDate}</span>
+                                <span style="font-size:0.75rem; color: var(--text-muted); margin-left: 6px;">${rewards}</span>
+                            </div>
+                        </div>
+                        <div class="action-wrapper">
+                            <button class="check-btn" onclick="toggleConfirm(${index}, event)">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                            </button>
+                            <div class="confirm-popup" id="popup-${index}">
+                                <button class="confirm-btn no" onclick="toggleConfirm(${index}, event)">Нет</button>
+                                <button class="confirm-btn yes" onclick="completeQuest(${index})">Готово</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function addQuest() {
+            const input = document.getElementById('quest-input');
+            const sphereId = parseInt(document.getElementById('quest-sphere').value);
+            const difficulty = document.getElementById('quest-difficulty').value;
+            if (!input || !input.value.trim()) return;
+
+            quests.push({ text: input.value, sphereId: sphereId, difficulty: difficulty, date: selectedDateStr });
+            input.value = '';
+            saveGame();
+            updateUI();
+        }
+
+        function toggleConfirm(index, event) {
+            event.stopPropagation();
+            document.querySelectorAll('.confirm-popup').forEach((p, idx) => {
+                if(idx !== index) p.classList.remove('active');
+            });
+            const popup = document.getElementById(`popup-${index}`);
+            if(popup) popup.classList.toggle('active');
+        }
+
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.confirm-popup').forEach(p => p.classList.remove('active'));
+        });
+
+        function completeQuest(index) {
+            const questEl = document.getElementById(`quest-${index}`);
+            if(questEl) questEl.classList.add('fade-out');
+
+            setTimeout(() => {
+                const quest = quests[index];
+                if(!quest) return;
+                let xpReward = 50;
+
+                if (quest.difficulty === 'easy') { xpReward = 20; state.easyCompleted++; }
+                if (quest.difficulty === 'medium') { state.medCompleted++; }
+                if (quest.difficulty === 'hard') { xpReward = 100; state.hardCompleted++; }
+
+                state.totalCompleted += 1;
+
+                let targetSphere = state.spheres[quest.sphereId];
+                targetSphere.xp += xpReward;
+
+                let leveledUpSphere = false;
+                if (targetSphere.xp >= targetSphere.nextXp) {
+                    targetSphere.xp -= targetSphere.nextXp;
+                    targetSphere.level++;
+                    targetSphere.nextXp = Math.floor(targetSphere.nextXp * 1.25);
+                    leveledUpSphere = true;
+                }
+
+                state.mainXp += Math.floor(xpReward * 0.7);
+                
+                let leveledUpMain = false;
+                if (state.mainXp >= state.mainNextLevelXp) {
+                    state.mainXp -= state.mainNextLevelXp;
+                    state.mainLevel++;
+                    state.mainNextLevelXp = Math.floor(state.mainNextLevelXp * 1.35);
+                    leveledUpMain = true;
+                }
+
+                if (leveledUpMain) {
+                    showModal("ГЛОБАЛЬНЫЙ ЛЕВЕЛАП!", "Ваш общий ранг ядра вырос до " + state.mainLevel + " уровня.");
+                } else if (leveledUpSphere) {
+                    showModal("Сфера прокачана!", "Сфера \"" + targetSphere.name + "\" развилась до " + targetSphere.level + " уровня!");
+                }
+
+                quests.splice(index, 1);
+                saveGame();
+                updateUI();
+            }, 400);
+        }
+
+        function showModal(title, desc) {
+            const t = document.getElementById('modal-title');
+            const d = document.getElementById('modal-desc');
+            if(t) t.innerText = title;
+            if(d) d.innerText = desc;
+            const m = document.getElementById('levelup-modal');
+            if(m) m.classList.add('active');
+        }
+
+        function closeModal() { 
+            const m = document.getElementById('levelup-modal');
+            if(m) m.classList.remove('active'); 
+        }
+        function openAchModal() { buildAchievementsUI(); const m = document.getElementById('ach-modal'); if(m) m.classList.add('active'); }
+        function closeAchModal() { const m = document.getElementById('ach-modal'); if(m) m.classList.remove('active'); }
+        function openCalModal() { renderCalendar(); const m = document.getElementById('cal-modal'); if(m) m.classList.add('active'); }
+        function closeCalModal() { const m = document.getElementById('cal-modal'); if(m) m.classList.remove('active'); }
+
+        updateUI();
+    </script>
+</body>
+</html>
