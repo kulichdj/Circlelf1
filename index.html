@@ -114,8 +114,8 @@
             -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
         }
 
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
-        .action-btn { width: 100%; justify-content: center; font-size: 0.85rem; padding: 14px; border-radius: 16px; margin-bottom: 0; }
+        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 24px; }
+        .action-btn { width: 100%; justify-content: center; font-size: 0.75rem; padding: 12px 6px; border-radius: 14px; margin-bottom: 0; white-space: nowrap; }
 
         .glass-panel { background: var(--panel-bg); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px); border-radius: 28px; box-shadow: var(--shadow); padding: 24px; margin-bottom: 24px; position: relative; }
         .hero-stats { display: flex; align-items: center; gap: 24px; }
@@ -158,10 +158,10 @@
         h3 { font-weight: 400; font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
 
         .input-group { display: flex; flex-direction: column; gap: 12px; }
-        input, select { padding: 14px 16px; background: var(--input-bg); border: 1px solid transparent; border-radius: 16px; font-size: 0.95rem; color: var(--text-main); transition: all 0.25s; }
-        input:focus, select:focus { border-color: rgba(255, 255, 255, 0.15); }
-        input::placeholder { color: #555; }
-        body.light-theme input::placeholder { color: #b5b5b7; }
+        input, select, textarea { padding: 14px 16px; background: var(--input-bg); border: 1px solid transparent; border-radius: 16px; font-size: 0.95rem; color: var(--text-main); transition: all 0.25s; font-family: inherit; }
+        input:focus, select:focus, textarea:focus { border-color: rgba(255, 255, 255, 0.15); }
+        input::placeholder, textarea::placeholder { color: #555; }
+        body.light-theme input::placeholder, body.light-theme textarea::placeholder { color: #b5b5b7; }
         select option { background-color: var(--bg-color); color: var(--text-main); }
 
         button.main-btn { background-color: var(--accent-color); color: var(--bg-color); border: none; padding: 15px; border-radius: 16px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
@@ -227,6 +227,10 @@
         body.light-theme .cal-cell.has-tasks::after { background: rgba(0, 0, 0, 0.4); }
         .cal-cell.selected { background: var(--cal-active) !important; color: var(--cal-active-text) !important; font-weight: 600; }
         .cal-cell.empty { pointer-events: none; opacity: 0; }
+
+        /* СТИЛИ ДНЕВНИКА */
+        .diary-status-tag { display: inline-block; font-size: 0.65rem; background: rgba(34, 197, 94, 0.15); color: #4ade80; padding: 2px 8px; border-radius: 8px; margin-top: 4px; font-weight: 500; }
+        textarea.diary-area { width: 100%; height: 160px; resize: none; line-height: 1.5; font-size: 0.95rem; }
     </style>
 </head>
 <body>
@@ -324,7 +328,8 @@
 
         <!-- КНОПКИ ДЕЙСТВИЙ (СЕТКА) -->
         <div class="action-grid">
-            <button class="action-btn" onclick="openCalModal()">📅 Календарь целей</button>
+            <button class="action-btn" onclick="openCalModal()">📅 Календарь</button>
+            <button class="action-btn" onclick="openDiaryModal()">📖 Дневник мысли</button>
             <button class="action-btn" onclick="openAchModal()">🏆 Достижения</button>
         </div>
 
@@ -364,6 +369,19 @@
             <h4>Свиток достижений</h4>
             <div class="ach-list-scroll" id="ach-list-container"></div>
             <button class="close-ach-btn" onclick="closeAchModal()">Вернуться к целям</button>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА ДНЕВНИКА -->
+    <div class="modal-overlay" id="diary-modal">
+        <div class="modal-box" style="max-width: 400px; width: 90%; text-align: left;">
+            <h4 style="margin-bottom: 4px;">Дневник мыслей</h4>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;" id="diary-date-label">12 января</div>
+            <div class="input-group">
+                <textarea class="diary-area" id="diary-textarea" placeholder="Запиши свои инсайты, итоги дня или важные мысли..."></textarea>
+                <button class="main-btn" onclick="saveDiaryEntry()">Сохранить заметку</button>
+                <button class="close-ach-btn" onclick="closeDiaryModal()" style="background: transparent; color: var(--text-main); margin-top: 4px;">Закрыть</button>
+            </div>
         </div>
     </div>
 
@@ -413,6 +431,9 @@
             unlockedAchs: []
         };
 
+        // Хранилище записей дневника в формате { "YYYY-MM-DD": "текст заметки" }
+        let diaryNotes = JSON.parse(localStorage.getItem('circle_lf_diary_v1')) || {};
+
         const achDatabase = [
             { id: 0, icon: "🌱", title: "Первый триумф", desc: "Успешно закройте вашу самую первую цель" },
             { id: 1, icon: "⚡", title: "Разгон набран", desc: "Выполните суммарно 5 любых задач" },
@@ -452,6 +473,7 @@
         function saveGame() {
             localStorage.setItem('rpg_glass_v2.0_state', JSON.stringify(state));
             localStorage.setItem('rpg_glass_v2.0_quests', JSON.stringify(quests));
+            localStorage.setItem('circle_lf_diary_v1', JSON.stringify(diaryNotes));
         }
 
         function saveSphereNames() {
@@ -556,7 +578,7 @@
                 let dayStr = String(day).padStart(2, '0');
                 let cellDateStr = currentCalYear + "-" + monthStr + "-" + dayStr;
 
-                let hasTasks = quests.some(q => q.date === cellDateStr);
+                let hasTasks = quests.some(q => q.date === cellDateStr) || !!diaryNotes[cellDateStr];
                 let isSelected = selectedDateStr === cellDateStr;
 
                 container.innerHTML += `
@@ -578,6 +600,33 @@
         function selectDate(dateStr) {
             selectedDateStr = dateStr;
             renderCalendar();
+            updateUI();
+        }
+
+        /* ЛОГИКА ДНЕВНИКА */
+        function openDiaryModal() {
+            let d = new Date(selectedDateStr);
+            let formattedDate = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+            
+            document.getElementById('diary-date-label').innerText = "Мысли за " + formattedDate;
+            document.getElementById('diary-textarea').value = diaryNotes[selectedDateStr] || "";
+            
+            document.getElementById('diary-modal').classList.add('active');
+        }
+
+        function closeDiaryModal() {
+            document.getElementById('diary-modal').classList.remove('active');
+        }
+
+        function saveDiaryEntry() {
+            const text = document.getElementById('diary-textarea').value.trim();
+            if (text) {
+                diaryNotes[selectedDateStr] = text;
+            } else {
+                delete diaryNotes[selectedDateStr];
+            }
+            saveGame();
+            closeDiaryModal();
             updateUI();
         }
 
@@ -631,7 +680,21 @@
             
             let filteredQuests = quests.filter(q => q.date === selectedDateStr);
 
-            if(filteredQuests.length === 0) {
+            // Если есть запись в дневнике за этот день, выведем её превью перед задачами
+            if (diaryNotes[selectedDateStr]) {
+                list.innerHTML += `
+                    <div class="quest-item" style="border-left: 3px solid #4ade80; cursor: pointer;" onclick="openDiaryModal()">
+                        <div style="width: 100%;">
+                            <div class="quest-title" style="font-size: 0.9rem; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px;">
+                                "${diaryNotes[selectedDateStr]}"
+                            </div>
+                            <div class="diary-status-tag">📖 Дневник заполнен</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if(filteredQuests.length === 0 && !diaryNotes[selectedDateStr]) {
                 list.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 30px; font-size: 0.9rem; font-style: italic;">На этот день задач нет. Свободное время.</div>';
             }
 
