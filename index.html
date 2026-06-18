@@ -145,9 +145,13 @@
 
         .credits-footer {
             text-align: center; font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 2px; color: var(--text-muted); opacity: 0.35; margin-top: 10px;
-            margin-bottom: 20px; pointer-events: none;
+            letter-spacing: 2px; color: var(--text-muted); opacity: 0.35; margin-top: 15px;
+            margin-bottom: 5px; pointer-events: none;
         }
+
+        .danger-zone-container { text-align: center; margin-bottom: 30px; }
+        .hard-reset-btn { background: transparent; border: none; color: #ef4444; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; opacity: 0.4; transition: opacity 0.3s; padding: 8px 16px; }
+        .hard-reset-btn:hover { opacity: 1; }
 
         h2 { font-weight: 300; font-size: 1.15rem; letter-spacing: 0.5px; margin-bottom: 16px; }
         h3 { font-weight: 400; font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
@@ -242,8 +246,8 @@
                 <div class="main-level-number" id="main-level">0</div>
             </div>
             <div class="main-text-stats">
-                <div class="stat-label">Ранг аккаунта</div>
-                <div class="stat-value" style="font-size: 1.2rem; font-weight: 300;" id="main-sphere-status">Загрузка...</div>
+                <div class="stat-label" id="profile-tag-label">Загрузка...</div>
+                <div class="stat-value" style="font-size: 1.2rem; font-weight: 300;" id="main-sphere-status">Новичок фокуса</div>
                 <div class="stat-label">Прогресс ядра</div>
                 <div id="main-xp-text" style="font-size: 0.8rem; color: var(--text-muted);">0 / 100 XP</div>
             </div>
@@ -305,7 +309,7 @@
         <div class="glass-panel">
             <h2 id="form-title">Новая цель</h2>
             <div class="input-group">
-                <input type="text" id="quest-input" placeholder="Что нужно сделать?">
+                <input type="text" id="quest-input" placeholder="What needs to be done?">
                 <select id="quest-sphere">
                     <option value="0" id="opt-0">Работа</option>
                     <option value="1" id="opt-1">Хобби</option>
@@ -332,6 +336,10 @@
         </div>
         
         <div class="credits-footer">by KULISINSKIY</div>
+        
+        <div class="danger-zone-container">
+            <button class="hard-reset-btn" onclick="requestHardReset()">⚠️ Сбросить весь прогресс</button>
+        </div>
     </div>
 
     <div class="modal-overlay" id="ach-modal">
@@ -403,7 +411,9 @@
 
         async function initApp() {
             if (!telegramId) {
-                telegramId = prompt("Введите ваш Telegram ID для синхронизации прогресса:") || "test_user";
+                // Пытаемся сделать красивую маску логина (@никнейм)
+                let input = prompt("Вход в систему Circle lf.\nВведите ваш Telegram ID или Никнейм:") || "test_user";
+                telegramId = input.trim().startsWith('@') ? input.trim() : '@' + input.trim();
                 localStorage.setItem('circle_lf_tg_id', telegramId);
             }
             await loadFromCloud();
@@ -411,24 +421,17 @@
 
         async function loadFromCloud() {
             if (!isCloudEnabled()) {
-                loadLocally();
-                hideSplash();
-                updateUI();
-                return;
+                loadLocally(); hideSplash(); updateUI(); return;
             }
             try {
-                // Задаем лимит ожидания для сети, чтобы приложение не висло бесконечно
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 4000);
-
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/user_progress?telegram_id=eq.${telegramId}`, {
                     headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` },
                     signal: controller.signal
                 });
                 clearTimeout(timeoutId);
-
                 if (!response.ok) throw new Error("Cloud bad response");
-                
                 const data = await response.json();
                 if (data && data.length > 0) {
                     state = data[0].game_state || createDefaultState();
@@ -441,8 +444,7 @@
                 console.warn("Аварийное переключение на локальный режим:", e.message);
                 loadLocally();
             }
-            hideSplash();
-            updateUI();
+            hideSplash(); updateUI();
         }
 
         function loadLocally() {
@@ -450,26 +452,47 @@
                 state = JSON.parse(localStorage.getItem('rpg_glass_v2.0_state')) || createDefaultState();
                 diaryNotes = JSON.parse(localStorage.getItem('circle_lf_diary_v1')) || {};
                 quests = JSON.parse(localStorage.getItem('rpg_glass_v2.0_quests')) || [];
-            } catch(e) {
-                state = createDefaultState();
-            }
+            } catch(e) { state = createDefaultState(); }
         }
 
         async function saveToCloud() {
             localStorage.setItem('rpg_glass_v2.0_state', JSON.stringify(state));
             localStorage.setItem('rpg_glass_v2.0_quests', JSON.stringify(quests));
             localStorage.setItem('circle_lf_diary_v1', JSON.stringify(diaryNotes));
-
             if (!isCloudEnabled()) return;
-
             try {
                 await fetch(`${SUPABASE_URL}/rest/v1/user_progress`, {
                     method: "POST",
                     headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
                     body: JSON.stringify({ telegram_id: telegramId, game_state: state, quests_state: quests, diary_state: diaryNotes, updated_at: new Date().toISOString() })
                 });
-            } catch(e) {
-                console.error("Ошибка синхронизации:", e);
+            } catch(e) { console.error("Ошибка сохранения:", e); }
+        }
+
+        // ФУНКЦИЯ ДВОЙНОГО ПОДТВЕРЖДЕНИЯ ПОЛНОГО СБРОСА
+        async function requestHardReset() {
+            let check = prompt("🚨 ВНИМАНИЕ: Это действие безвозвратно сотрет все ваши уровни, квесты и дневники на всех устройствах!\n\nДля подтверждения введите слово УДАЛИТЬ большими буквами:");
+            if (check === "УДАЛИТЬ") {
+                // 1. Очищаем локальную память
+                localStorage.removeItem('rpg_glass_v2.0_state');
+                localStorage.removeItem('rpg_glass_v2.0_quests');
+                localStorage.removeItem('circle_lf_diary_v1');
+                localStorage.removeItem('circle_lf_tg_id');
+
+                // 2. Стираем строчку из облака Supabase, если оно подключено
+                if (isCloudEnabled()) {
+                    try {
+                        await fetch(`${SUPABASE_URL}/rest/v1/user_progress?telegram_id=eq.${telegramId}`, {
+                            method: "DELETE",
+                            headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+                        });
+                    } catch(e) { console.error("Ошибка удаления строки из облака:", e); }
+                }
+
+                alert("Все данные успешно стерты. Приложение перезапускается.");
+                location.reload();
+            } else {
+                alert("Сброс отменен. Кодовое слово введено неверно.");
             }
         }
 
@@ -567,6 +590,9 @@
 
         function updateUI() {
             if (!state || !state.spheres) state = createDefaultState();
+
+            // Отображаем красивое приветствие с никнеймом
+            document.getElementById('profile-tag-label').innerText = "Профиль: " + (telegramId || "@user");
 
             document.getElementById('main-level').innerText = state.mainLevel;
             document.getElementById('main-xp-text').innerText = state.mainXp + " / " + state.mainNextLevelXp + " XP";
