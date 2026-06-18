@@ -397,9 +397,8 @@
             };
         }
 
-        // ПРОВЕРКА НАЛИЧИЯ КЛЮЧЕЙ
         function isCloudEnabled() {
-            return (SUPABASE_URL && SUPABASE_KEY && !SUPABASE_URL.includes("ВСТАВЬ_СЮДА"));
+            return (SUPABASE_URL && SUPABASE_KEY && !SUPABASE_URL.includes("ВСТАВЬ_СЮДА") && SUPABASE_URL.trim() !== "");
         }
 
         async function initApp() {
@@ -412,27 +411,34 @@
 
         async function loadFromCloud() {
             if (!isCloudEnabled()) {
-                // Автономный режим, если база не настроена
                 loadLocally();
                 hideSplash();
                 updateUI();
                 return;
             }
             try {
+                // Задаем лимит ожидания для сети, чтобы приложение не висло бесконечно
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 4000);
+
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/user_progress?telegram_id=eq.${telegramId}`, {
-                    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+                    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` },
+                    signal: controller.signal
                 });
-                if (!response.ok) throw new Error("Cloud error status: " + response.status);
+                clearTimeout(timeoutId);
+
+                if (!response.ok) throw new Error("Cloud bad response");
+                
                 const data = await response.json();
                 if (data && data.length > 0) {
                     state = data[0].game_state || createDefaultState();
                     quests = data[0].quests_state || [];
                     diaryNotes = data[0].diary_state || {};
                 } else {
-                    loadLocally(); // Если в облаке пусто, подтягиваем локальный кэш
+                    loadLocally();
                 }
             } catch(e) {
-                console.error("Supabase Error. Ипользуем локальную память.", e);
+                console.warn("Аварийное переключение на локальный режим:", e.message);
                 loadLocally();
             }
             hideSplash();
@@ -444,7 +450,9 @@
                 state = JSON.parse(localStorage.getItem('rpg_glass_v2.0_state')) || createDefaultState();
                 diaryNotes = JSON.parse(localStorage.getItem('circle_lf_diary_v1')) || {};
                 quests = JSON.parse(localStorage.getItem('rpg_glass_v2.0_quests')) || [];
-            } catch(e) {}
+            } catch(e) {
+                state = createDefaultState();
+            }
         }
 
         async function saveToCloud() {
@@ -461,11 +469,11 @@
                     body: JSON.stringify({ telegram_id: telegramId, game_state: state, quests_state: quests, diary_state: diaryNotes, updated_at: new Date().toISOString() })
                 });
             } catch(e) {
-                console.error("Ошибка автосохранения в облако", e);
+                console.error("Ошибка синхронизации:", e);
             }
         }
 
-        function hideSplash() { setTimeout(() => { const splash = document.getElementById('splash-layer'); if (splash) splash.classList.add('hidden'); }, 800); }
+        function hideSplash() { setTimeout(() => { const splash = document.getElementById('splash-layer'); if (splash) splash.classList.add('hidden'); }, 600); }
         function escapeHtml(text) { if (!text) return ''; return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;").replace(/\n/g, " "); }
 
         const achDatabase = [
@@ -532,7 +540,34 @@
         function closeDiaryModal() { document.getElementById('diary-modal').classList.remove('active'); }
         function saveDiaryEntry() { const text = document.getElementById('diary-textarea').value.trim(); if (text) diaryNotes[selectedDateStr] = text; else delete diaryNotes[selectedDateStr]; saveToCloud(); closeDiaryModal(); updateUI(); }
 
+        function triggerAchievement(id) { if (state.unlockedAchs && !state.unlockedAchs.includes(id)) { state.unlockedAchs.push(id); saveToCloud(); setTimeout(() => { showModal("🏆 ДОСТИЖЕНИЕ ОТКРЫТО!", `Вы разблокировали: "${achDatabase[id].title}"`); }, 600); } }
+        function evaluateAchievements() {
+            if (!state.unlockedAchs) state.unlockedAchs = [];
+            if (state.totalCompleted >= 1) triggerAchievement(0);
+            if (state.totalCompleted >= 5) triggerAchievement(1);
+            if (state.totalCompleted >= 25) triggerAchievement(2);
+            if (state.medCompleted >= 10) triggerAchievement(3);
+            if (state.hardCompleted >= 3) triggerAchievement(4);
+            if (state.hardCompleted >= 10) triggerAchievement(5);
+            let lvls = state.spheres.map(s => s.level);
+            if (Math.max(...lvls) >= 3) triggerAchievement(6);
+            if (Math.max(...lvls) >= 5) triggerAchievement(7);
+            if (Math.min(...lvls) >= 2) triggerAchievement(8);
+            if (state.mainLevel >= 5) triggerAchievement(9);
+            if (state.mainLevel >= 10) triggerAchievement(10);
+        }
+
+        function buildAchievementsUI() {
+            const container = document.getElementById('ach-list-container'); if(!container) return; container.innerHTML = '';
+            achDatabase.forEach(ach => {
+                const isUnlocked = state.unlockedAchs && state.unlockedAchs.includes(ach.id);
+                container.innerHTML += `<div class="ach-card ${isUnlocked ? 'unlocked' : ''}"><div class="ach-icon-box">${ach.icon}</div><div><div class="ach-title-text">${ach.title}</div><div class="ach-desc-text">${ach.desc}</div></div></div>`;
+            });
+        }
+
         function updateUI() {
+            if (!state || !state.spheres) state = createDefaultState();
+
             document.getElementById('main-level').innerText = state.mainLevel;
             document.getElementById('main-xp-text').innerText = state.mainXp + " / " + state.mainNextLevelXp + " XP";
             setCircleProgress('main-xp-circle', 52, (state.mainXp / state.mainNextLevelXp) * 100);
@@ -543,7 +578,8 @@
             document.getElementById('main-sphere-status').innerText = status;
 
             state.spheres.forEach((sphere, i) => {
-                document.getElementById(`sphere-name-${i}`).value = sphere.name;
+                const nameInput = document.getElementById(`sphere-name-${i}`);
+                if (nameInput) nameInput.value = sphere.name;
                 document.getElementById(`sphere-lvl-${i}`).innerText = sphere.level;
                 document.getElementById(`sphere-xp-${i}`).innerText = sphere.xp + "/" + sphere.nextXp + " XP";
                 setCircleProgress(`sphere-circle-${i}`, 32, (sphere.xp / sphere.nextXp) * 100);
@@ -556,8 +592,7 @@
 
             const list = document.getElementById('quests-list');
             const compList = document.getElementById('completed-quests-list');
-            list.innerHTML = '';
-            compList.innerHTML = '';
+            list.innerHTML = ''; compList.innerHTML = '';
             
             if (diaryNotes[selectedDateStr]) {
                 list.innerHTML += `
@@ -612,7 +647,7 @@
                                 </div>
                             </div>
                             <div>
-                                <button class="check-btn" onclick="undoQuest(${index})" style="border-color: var(--text-muted); font-size: 0.9rem;">↩️</button>
+                                <button class="check-btn" onclick="undoQuest(${index})" style="font-size: 0.9rem;">↩️</button>
                             </div>
                         </div>`;
                 }
