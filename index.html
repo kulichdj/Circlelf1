@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Circle lf</title>
     
-    <!-- ИКОНКА ДЛЯ РАБОЧЕГО СТОЛА СМАРТФОНА -->
     <link rel="apple-touch-icon" href="https://i.postimg.cc/mD3fR00n/rpg-life-icon.png">
     <link rel="icon" type="image/png" href="https://i.postimg.cc/mD3fR00n/rpg-life-icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -235,7 +234,6 @@
 </head>
 <body>
 
-    <!-- ВСТУПИТЕЛЬНЫЙ ЭКРАН -->
     <div class="splash-screen" id="splash-layer">
         <div class="splash-logo-container">
             <div class="splash-ring"></div>
@@ -261,7 +259,6 @@
 
     <div class="app-container">
 
-        <!-- ОБЩИЙ УРОВЕНЬ -->
         <div class="glass-panel hero-stats">
             <div class="main-circle-container">
                 <svg class="progress-ring" width="115" height="115">
@@ -278,7 +275,6 @@
             </div>
         </div>
 
-        <!-- 4 СФЕРЫ ПРОКАЧКИ -->
         <div class="spheres-grid">
             <div class="sphere-card">
                 <div class="sphere-circle-container">
@@ -326,14 +322,12 @@
             </div>
         </div>
 
-        <!-- КНОПКИ ДЕЙСТВИЙ (СЕТКА) -->
         <div class="action-grid">
             <button class="action-btn" onclick="openCalModal()">📅 Календарь</button>
             <button class="action-btn" onclick="openDiaryModal()">📖 Дневник мысли</button>
             <button class="action-btn" onclick="openAchModal()">🏆 Достижения</button>
         </div>
 
-        <!-- ТАСК МЕНЕДЖЕР -->
         <div class="glass-panel">
             <h2 id="form-title">Новая цель</h2>
             <div class="input-group">
@@ -353,7 +347,6 @@
             </div>
         </div>
 
-        <!-- СПИСОК ЗАДАЧ -->
         <div class="quests-container">
             <h3 id="quests-header-text">Активные цели</h3>
             <div id="quests-list"></div>
@@ -363,7 +356,6 @@
 
     </div>
 
-    <!-- МОДАЛЬНЫЕ ОКНА -->
     <div class="modal-overlay" id="ach-modal">
         <div class="modal-box ach-box">
             <h4>Свиток достижений</h4>
@@ -372,7 +364,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА ДНЕВНИКА -->
     <div class="modal-overlay" id="diary-modal">
         <div class="modal-box" style="max-width: 400px; width: 90%; text-align: left;">
             <h4 style="margin-bottom: 4px;">Дневник мыслей</h4>
@@ -414,25 +405,45 @@
             }, 1500);
         });
 
-        let state = JSON.parse(localStorage.getItem('rpg_glass_v2.0_state')) || {
-            mainLevel: 0,
-            mainXp: 0,
-            mainNextLevelXp: 100,
-            totalCompleted: 0,
-            easyCompleted: 0,
-            medCompleted: 0,
-            hardCompleted: 0,
-            spheres: [
-                { id: 0, name: "Работа", level: 0, xp: 0, nextXp: 100 },
-                { id: 1, name: "Хобби", level: 0, xp: 0, nextXp: 100 },
-                { id: 2, name: "Отдых", level: 0, xp: 0, nextXp: 100 },
-                { id: 3, name: "Спорт", level: 0, xp: 0, nextXp: 100 }
-            ],
-            unlockedAchs: []
-        };
+        // Безопасное чтение базового состояния (защита от краша при парсинге)
+        let state;
+        try {
+            state = JSON.parse(localStorage.getItem('rpg_glass_v2.0_state')) || createDefaultState();
+        } catch(e) {
+            state = createDefaultState();
+        }
 
-        // Хранилище записей дневника в формате { "YYYY-MM-DD": "текст заметки" }
-        let diaryNotes = JSON.parse(localStorage.getItem('circle_lf_diary_v1')) || {};
+        function createDefaultState() {
+            return {
+                mainLevel: 0, mainXp: 0, mainNextLevelXp: 100, totalCompleted: 0, easyCompleted: 0, medCompleted: 0, hardCompleted: 0,
+                spheres: [
+                    { id: 0, name: "Работа", level: 0, xp: 0, nextXp: 100 },
+                    { id: 1, name: "Хобби", level: 0, xp: 0, nextXp: 100 },
+                    { id: 2, name: "Отдых", level: 0, xp: 0, nextXp: 100 },
+                    { id: 3, name: "Спорт", level: 0, xp: 0, nextXp: 100 }
+                ], unlockedAchs: []
+            };
+        }
+
+        // Безопасное чтение дневника
+        let diaryNotes = {};
+        try {
+            diaryNotes = JSON.parse(localStorage.getItem('circle_lf_diary_v1')) || {};
+        } catch(e) {
+            diaryNotes = {};
+        }
+
+        // Безопасная функция очистки спецсимволов для HTML-вывода (чтобы длинный текст с кавычками не ломал разметку)
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;")
+                .replace(/\n/g, " ");
+        }
 
         const achDatabase = [
             { id: 0, icon: "🌱", title: "Первый триумф", desc: "Успешно закройте вашу самую первую цель" },
@@ -452,7 +463,12 @@
         let currentTheme = localStorage.getItem('rpg_graphite_theme_mode_v4') || 'dark';
         if (currentTheme === 'light') { document.body.classList.add('light-theme'); }
 
-        let quests = JSON.parse(localStorage.getItem('rpg_glass_v2.0_quests')) || [];
+        let quests = [];
+        try {
+            quests = JSON.parse(localStorage.getItem('rpg_glass_v2.0_quests')) || [];
+        } catch(e) {
+            quests = [];
+        }
 
         let today = new Date();
         let currentCalYear = today.getFullYear();
@@ -471,9 +487,13 @@
         }
 
         function saveGame() {
-            localStorage.setItem('rpg_glass_v2.0_state', JSON.stringify(state));
-            localStorage.setItem('rpg_glass_v2.0_quests', JSON.stringify(quests));
-            localStorage.setItem('circle_lf_diary_v1', JSON.stringify(diaryNotes));
+            try {
+                localStorage.setItem('rpg_glass_v2.0_state', JSON.stringify(state));
+                localStorage.setItem('rpg_glass_v2.0_quests', JSON.stringify(quests));
+                localStorage.setItem('circle_lf_diary_v1', JSON.stringify(diaryNotes));
+            } catch(e) {
+                console.error("Превышен лимит памяти хранилища смартфона!");
+            }
         }
 
         function saveSphereNames() {
@@ -680,13 +700,14 @@
             
             let filteredQuests = quests.filter(q => q.date === selectedDateStr);
 
-            // Если есть запись в дневнике за этот день, выведем её превью перед задачами
+            // Безопасный вывод превью дневника с защитой от опасных символов
             if (diaryNotes[selectedDateStr]) {
+                let safeText = escapeHtml(diaryNotes[selectedDateStr]);
                 list.innerHTML += `
                     <div class="quest-item" style="border-left: 3px solid #4ade80; cursor: pointer;" onclick="openDiaryModal()">
                         <div style="width: 100%;">
                             <div class="quest-title" style="font-size: 0.9rem; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px;">
-                                "${diaryNotes[selectedDateStr]}"
+                                "${safeText}"
                             </div>
                             <div class="diary-status-tag">📖 Дневник заполнен</div>
                         </div>
