@@ -170,7 +170,6 @@
 
         .action-wrapper { position: relative; display: flex; align-items: center; }
         button.check-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.12); background: transparent; cursor: pointer; display: flex; justify-content: center; align-items: center; color: var(--text-main); }
-        body.light-theme button.check-btn { border-color: rgba(0,0,0,0.12); }
 
         .confirm-popup { position: absolute; right: 0; background: var(--text-main); padding: 4px; border-radius: 20px; display: flex; gap: 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); opacity: 0; pointer-events: none; transform: scale(0.8) translateX(10px); transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10; }
         .confirm-popup.active { opacity: 1; pointer-events: auto; transform: scale(1) translateX(0); }
@@ -209,9 +208,8 @@
     </style>
 </head>
 <body>
-<https://jirtcalmrvhoaeptigrn.supabase.co
-    <sb_publishable_Qd-Dv5QmMFMeN46R3Hb2FQ_0RnajUE1
-sb_secret_91XPEGVZnD5CrMF9_0vzpg_UmWJkY2gdiv class="splash-screen" id="splash-layer">
+
+    <div class="splash-screen" id="splash-layer">
         <div class="splash-logo-container">
             <div class="splash-ring"></div>
             <div style="font-size: 1.6rem; font-weight: 200;">Circle</div>
@@ -378,15 +376,11 @@ sb_secret_91XPEGVZnD5CrMF9_0vzpg_UmWJkY2gdiv class="splash-screen" id="splash-la
 
     <script>
         // === НАСТРОЙКА КЛЮЧЕЙ SUPABASE ===
-        const SUPABASE_URL = "ВСТАВЬ_СЮДА_PROJECT_URL";
-        const SUPABASE_KEY = "ВСТАВЬ_СЮДА_ANON_PUBLIC_KEY";
+        const SUPABASE_URL = "https://jirtcalmrvhoaeptigrn.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_Qd-Dv5QmMFMeN46R3Hb2FQ_0RnajUE1";
 
         let telegramId = localStorage.getItem('circle_lf_tg_id');
-        if(!telegramId) {
-            telegramId = prompt("Введите ваш Telegram ID для синхронизации прогресса:") || "test_user";
-            localStorage.setItem('circle_lf_tg_id', telegramId);
-        }
-
+        
         let state = createDefaultState();
         let diaryNotes = {};
         let quests = [];
@@ -403,44 +397,75 @@ sb_secret_91XPEGVZnD5CrMF9_0vzpg_UmWJkY2gdiv class="splash-screen" id="splash-la
             };
         }
 
+        // ПРОВЕРКА НАЛИЧИЯ КЛЮЧЕЙ
+        function isCloudEnabled() {
+            return (SUPABASE_URL && SUPABASE_KEY && !SUPABASE_URL.includes("ВСТАВЬ_СЮДА"));
+        }
+
+        async function initApp() {
+            if (!telegramId) {
+                telegramId = prompt("Введите ваш Telegram ID для синхронизации прогресса:") || "test_user";
+                localStorage.setItem('circle_lf_tg_id', telegramId);
+            }
+            await loadFromCloud();
+        }
+
         async function loadFromCloud() {
-            if(SUPABASE_URL.includes("ВСТАВЬ_СЮДА")) {
-                try {
-                    state = JSON.parse(localStorage.getItem('rpg_glass_v2.0_state')) || createDefaultState();
-                    diaryNotes = JSON.parse(localStorage.getItem('circle_lf_diary_v1')) || {};
-                    quests = JSON.parse(localStorage.getItem('rpg_glass_v2.0_quests')) || [];
-                } catch(e) {}
-                hideSplash(); updateUI(); return;
+            if (!isCloudEnabled()) {
+                // Автономный режим, если база не настроена
+                loadLocally();
+                hideSplash();
+                updateUI();
+                return;
             }
             try {
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/user_progress?telegram_id=eq.${telegramId}`, {
                     headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
                 });
+                if (!response.ok) throw new Error("Cloud error status: " + response.status);
                 const data = await response.json();
-                if(data && data.length > 0) {
+                if (data && data.length > 0) {
                     state = data[0].game_state || createDefaultState();
                     quests = data[0].quests_state || [];
                     diaryNotes = data[0].diary_state || {};
+                } else {
+                    loadLocally(); // Если в облаке пусто, подтягиваем локальный кэш
                 }
-            } catch(e) { console.error(e); }
-            hideSplash(); updateUI();
+            } catch(e) {
+                console.error("Supabase Error. Ипользуем локальную память.", e);
+                loadLocally();
+            }
+            hideSplash();
+            updateUI();
+        }
+
+        function loadLocally() {
+            try {
+                state = JSON.parse(localStorage.getItem('rpg_glass_v2.0_state')) || createDefaultState();
+                diaryNotes = JSON.parse(localStorage.getItem('circle_lf_diary_v1')) || {};
+                quests = JSON.parse(localStorage.getItem('rpg_glass_v2.0_quests')) || [];
+            } catch(e) {}
         }
 
         async function saveToCloud() {
             localStorage.setItem('rpg_glass_v2.0_state', JSON.stringify(state));
             localStorage.setItem('rpg_glass_v2.0_quests', JSON.stringify(quests));
             localStorage.setItem('circle_lf_diary_v1', JSON.stringify(diaryNotes));
-            if(SUPABASE_URL.includes("ВСТАВЬ_СЮДА")) return;
+
+            if (!isCloudEnabled()) return;
+
             try {
                 await fetch(`${SUPABASE_URL}/rest/v1/user_progress`, {
                     method: "POST",
                     headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
                     body: JSON.stringify({ telegram_id: telegramId, game_state: state, quests_state: quests, diary_state: diaryNotes, updated_at: new Date().toISOString() })
                 });
-            } catch(e) { console.error(e); }
+            } catch(e) {
+                console.error("Ошибка автосохранения в облако", e);
+            }
         }
 
-        function hideSplash() { setTimeout(() => { const splash = document.getElementById('splash-layer'); if (splash) splash.classList.add('hidden'); }, 1000); }
+        function hideSplash() { setTimeout(() => { const splash = document.getElementById('splash-layer'); if (splash) splash.classList.add('hidden'); }, 800); }
         function escapeHtml(text) { if (!text) return ''; return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;").replace(/\n/g, " "); }
 
         const achDatabase = [
@@ -484,6 +509,7 @@ sb_secret_91XPEGVZnD5CrMF9_0vzpg_UmWJkY2gdiv class="splash-screen" id="splash-la
 
         function updateDropdowns() { for(let i=0; i<4; i++) { const el = document.getElementById(`opt-${i}`); if (el) el.innerText = state.spheres[i].name; } }
         function setCircleProgress(elementId, radius, percent) { const circle = document.getElementById(elementId); if (!circle) return; const circumference = 2 * Math.PI * radius; circle.style.strokeDasharray = circumference + ' ' + circumference; circle.style.strokeDashoffset = circumference - (percent / 100 * circumference); }
+        
         function renderCalendar() {
             const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
             document.getElementById('cal-month-title').innerText = monthNames[currentCalMonth] + " " + currentCalYear;
@@ -507,10 +533,6 @@ sb_secret_91XPEGVZnD5CrMF9_0vzpg_UmWJkY2gdiv class="splash-screen" id="splash-la
         function saveDiaryEntry() { const text = document.getElementById('diary-textarea').value.trim(); if (text) diaryNotes[selectedDateStr] = text; else delete diaryNotes[selectedDateStr]; saveToCloud(); closeDiaryModal(); updateUI(); }
 
         function updateUI() {
-            const isLight = document.body.classList.contains('light-theme');
-            document.getElementById('theme-btn-icon').innerText = isLight ? "🌙" : "☀️";
-            document.getElementById('theme-btn-text').innerText = isLight ? "Темная тема" : "Светлая тема";
-
             document.getElementById('main-level').innerText = state.mainLevel;
             document.getElementById('main-xp-text').innerText = state.mainXp + " / " + state.mainNextLevelXp + " XP";
             setCircleProgress('main-xp-circle', 52, (state.mainXp / state.mainNextLevelXp) * 100);
@@ -527,7 +549,7 @@ sb_secret_91XPEGVZnD5CrMF9_0vzpg_UmWJkY2gdiv class="splash-screen" id="splash-la
                 setCircleProgress(`sphere-circle-${i}`, 32, (sphere.xp / sphere.nextXp) * 100);
             });
 
-            updateDropdowns(); if (state.totalCompleted > 0) { if (typeof state.easyCompleted === 'undefined') { state.easyCompleted = 0; state.medCompleted = 0; state.hardCompleted = 0; } }
+            updateDropdowns(); evaluateAchievements();
 
             let d = new Date(selectedDateStr);
             document.getElementById('quests-header-text').innerText = "Цели на " + d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
@@ -562,7 +584,6 @@ sb_secret_91XPEGVZnD5CrMF9_0vzpg_UmWJkY2gdiv class="splash-screen" id="splash-la
                 let rewards = quest.difficulty === 'easy' ? "+20 XP" : quest.difficulty === 'hard' ? "+100 XP" : "+50 XP";
                 
                 if(!quest.completed) {
-                    // Рендер активных целей
                     list.innerHTML += `
                         <div class="quest-item" id="quest-${index}">
                             <div>
@@ -581,7 +602,6 @@ sb_secret_91XPEGVZnD5CrMF9_0vzpg_UmWJkY2gdiv class="splash-screen" id="splash-la
                             </div>
                         </div>`;
                 } else {
-                    // Рендер выполненных целей (История с возможностью ОТКАТА)
                     compList.innerHTML += `
                         <div class="quest-item" id="quest-${index}" style="opacity: 0.65; border-left: 2px dashed var(--text-muted);">
                             <div>
@@ -592,7 +612,7 @@ sb_secret_91XPEGVZnD5CrMF9_0vzpg_UmWJkY2gdiv class="splash-screen" id="splash-la
                                 </div>
                             </div>
                             <div>
-                                <button class="check-btn" onclick="undoQuest(${index})" title="Отменить выполнение задачи" style="border-color: var(--text-muted); font-size: 0.9rem;">↩️</button>
+                                <button class="check-btn" onclick="undoQuest(${index})" style="border-color: var(--text-muted); font-size: 0.9rem;">↩️</button>
                             </div>
                         </div>`;
                 }
@@ -646,46 +666,26 @@ sb_secret_91XPEGVZnD5CrMF9_0vzpg_UmWJkY2gdiv class="splash-screen" id="splash-la
             }, 400);
         }
 
-        // КЛЮЧЕВАЯ ФУНКЦИЯ: ПОЛНЫЙ МАТЕМАТИЧЕСКИЙ ОТКАТ ЗАДАЧИ
         function undoQuest(index) {
             const quest = quests[index];
             if(!quest) return;
-            
             let xpReward = quest.difficulty === 'easy' ? 20 : quest.difficulty === 'hard' ? 100 : 50;
 
-            // 1. Откат счетчиков
             if(quest.difficulty === 'easy' && state.easyCompleted > 0) state.easyCompleted--;
             if(quest.difficulty === 'medium' && state.medCompleted > 0) state.medCompleted--;
             if(quest.difficulty === 'hard' && state.hardCompleted > 0) state.hardCompleted--;
             if(state.totalCompleted > 0) state.totalCompleted--;
 
-            // 2. Откат опыта сферы
             let ts = state.spheres[quest.sphereId];
             ts.xp -= xpReward;
-            
-            // Если ушли в минус по опыту — значит, откатываем уровень сферы назад!
-            if (ts.xp < 0 && ts.level > 0) {
-                ts.level--;
-                ts.nextXp = Math.ceil(ts.nextXp / 1.25);
-                ts.xp = ts.nextXp + ts.xp; // Восстанавливаем остаток опыта
-            } else if (ts.xp < 0) {
-                ts.xp = 0; // На нулевом уровне опыт ниже нуля не падает
-            }
+            if (ts.xp < 0 && ts.level > 0) { ts.level--; ts.nextXp = Math.ceil(ts.nextXp / 1.25); ts.xp = ts.nextXp + ts.xp; } 
+            else if (ts.xp < 0) { ts.xp = 0; }
 
-            // 3. Откат основного опыта аккаунта (70% от награды)
             let mainReward = Math.floor(xpReward * 0.7);
             state.mainXp -= mainReward;
-            
-            // Если ушли в минус по основному опыту — откатываем общий уровень назад!
-            if (state.mainXp < 0 && state.mainLevel > 0) {
-                state.mainLevel--;
-                state.mainNextLevelXp = Math.ceil(state.mainNextLevelXp / 1.35);
-                state.mainXp = state.mainNextLevelXp + state.mainXp;
-            } else if (state.mainXp < 0) {
-                state.mainXp = 0;
-            }
+            if (state.mainXp < 0 && state.mainLevel > 0) { state.mainLevel--; state.mainNextLevelXp = Math.ceil(state.mainNextLevelXp / 1.35); state.mainXp = state.mainNextLevelXp + state.mainXp; } 
+            else if (state.mainXp < 0) { state.mainXp = 0; }
 
-            // 4. Переводим таск обратно в активные
             quest.completed = false;
             saveToCloud(); updateUI();
         }
@@ -697,7 +697,7 @@ sb_secret_91XPEGVZnD5CrMF9_0vzpg_UmWJkY2gdiv class="splash-screen" id="splash-la
         function openCalModal() { renderCalendar(); document.getElementById('cal-modal').classList.add('active'); }
         function closeCalModal() { document.getElementById('cal-modal').classList.remove('active'); }
 
-        window.onload = loadFromCloud;
+        window.onload = initApp;
     </script>
 </body>
 </html>
