@@ -13,7 +13,6 @@
 
     <style>
         :root {
-            /* ТЁМНАЯ ТЕМА — УЛЬТРАГЛАСС */
             --bg-color: #0b0c10;
             --panel-bg: linear-gradient(135deg, rgba(35, 37, 49, 0.45) 0%, rgba(15, 16, 22, 0.65) 100%);
             --border-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(255, 255, 255, 0.12) 100%);
@@ -33,7 +32,6 @@
         }
 
         body.light-theme {
-            /* СВЕТЛАЯ ТЕМА — ОПАЛОВОЕ СТЕКЛО */
             --bg-color: #f0f2f6;
             --panel-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.75) 0%, rgba(240, 242, 245, 0.5) 100%);
             --border-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(0, 0, 0, 0.04) 50%, rgba(0, 0, 0, 0.1) 100%);
@@ -70,7 +68,6 @@
             transition: background-color 0.5s ease, color 0.4s ease;
         }
 
-        /* ВСТУПИТЕЛЬНЫЙ ЭКРАН (SPLASH SCREEN) */
         .splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #0b0c10; display: flex; flex-direction: column;
@@ -98,7 +95,6 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 0.6; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1); } }
 
-        /* ИНТЕРФЕЙС */
         .app-container { width: 100%; max-width: 440px; z-index: 1; position: relative; }
         .theme-switcher { width: 100%; max-width: 440px; display: flex; justify-content: flex-end; margin-bottom: 20px; }
 
@@ -161,7 +157,6 @@
         input:focus, select:focus, textarea:focus { border-color: rgba(255, 255, 255, 0.15); }
         input::placeholder, textarea::placeholder { color: #555; }
         body.light-theme input::placeholder, body.light-theme textarea::placeholder { color: #b5b5b7; }
-        select option { background-color: var(--bg-color); color: var(--text-main); }
 
         button.main-btn { background-color: var(--accent-color); color: var(--bg-color); border: none; padding: 15px; border-radius: 16px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
         button.main-btn:active { transform: scale(0.98); }
@@ -170,13 +165,8 @@
         .quest-item::before { content: ''; position: absolute; top:0; left:0; right:0; bottom:0; border-radius: inherit; padding: 1px; background: var(--border-gradient); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
         .quest-title { font-weight: 400; font-size: 1rem; margin-bottom: 4px; }
         
-        .quest-tag {
-            display: inline-block; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;
-            background: var(--circle-bg); padding: 2px 8px; border-radius: 8px; color: var(--text-muted); margin-top: 2px;
-        }
-        .quest-date-tag {
-            display: inline-block; font-size: 0.65rem; letter-spacing: 0.3px; background: rgba(120, 119, 198, 0.2); padding: 2px 8px; border-radius: 8px; color: var(--text-main); margin-top: 2px; margin-left: 4px;
-        }
+        .quest-tag { display: inline-block; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; background: var(--circle-bg); padding: 2px 8px; border-radius: 8px; color: var(--text-muted); margin-top: 2px; }
+        .quest-date-tag { display: inline-block; font-size: 0.65rem; letter-spacing: 0.3px; background: rgba(120, 119, 198, 0.2); padding: 2px 8px; border-radius: 8px; color: var(--text-main); margin-top: 2px; margin-left: 4px; }
 
         .action-wrapper { position: relative; display: flex; align-items: center; }
         button.check-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.12); background: transparent; cursor: pointer; display: flex; justify-content: center; align-items: center; color: var(--text-main); }
@@ -187,54 +177,41 @@
         .confirm-btn { border: none; padding: 6px 14px; border-radius: 16px; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
         .confirm-btn.yes { background: var(--bg-color); color: var(--text-main); }
         .confirm-btn.no { background: transparent; color: var(--bg-color); }
-        body.light-theme .confirm-btn.no { color: #ffffff; }
         .quest-item.fade-out { opacity: 0; transform: scale(0.9) translateY(-10px); }
 
-        /* --- МОДАЛЬНЫЕ ОКНА --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-box { background: var(--panel-bg); color: var(--text-main); padding: 30px; border-radius: 24px; text-align: center; max-width: 350px; width: 85%; transform: scale(0.8); transition: transform 0.3s; position: relative; box-shadow: var(--shadow); }
         .modal-overlay.active .modal-box { transform: scale(1); }
-        .modal-box h4 { font-size: 1.3rem; margin-bottom: 8px; font-weight: 500; }
-        .modal-box p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
-        .modal-box button { background: var(--text-main); color: var(--bg-color); border: none; padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; }
         
         .close-ach-btn { background: var(--text-main); color: var(--bg-color); border: none; padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; margin-top: auto; }
-
         .ach-box { max-width: 420px; height: 80vh; display: flex; flex-direction: column; text-align: left; padding: 24px; }
-        .ach-list-scroll { flex-grow: 1; overflow-y: auto; margin: 16px 0; padding-right: 4px; display: flex; flex-direction: column; gap: 12px; }
-        .ach-list-scroll::-webkit-scrollbar { width: 4px; }
-        .ach-list-scroll::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
-        .ach-card { display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: rgba(0,0,0,0.1); border-radius: 18px; position: relative; transition: all 0.4s; }
+        .ach-list-scroll { flex-grow: 1; overflow-y: auto; margin: 16px 0; display: flex; flex-direction: column; gap: 12px; }
+        .ach-card { display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: rgba(0,0,0,0.1); border-radius: 18px; position: relative; }
         .ach-card.unlocked { background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%); }
-        body.light-theme .ach-card.unlocked { background: linear-gradient(135deg, rgba(0,0,0,0.03) 0%, rgba(0,0,0,0.01) 100%); }
-        .ach-icon-box { font-size: 1.6rem; filter: grayscale(1); opacity: 0.2; transition: all 0.4s; }
-        .ach-card.unlocked .ach-icon-box { filter: grayscale(0); opacity: 1; transform: scale(1.05); }
-        .ach-info-box { flex-grow: 1; }
-        .ach-title-text { font-size: 0.9rem; font-weight: 600; opacity: 0.4; transition: opacity 0.3s; }
+        .ach-icon-box { font-size: 1.6rem; filter: grayscale(1); opacity: 0.2; }
+        .ach-card.unlocked .ach-icon-box { filter: grayscale(0); opacity: 1; }
+        .ach-title-text { font-size: 0.9rem; font-weight: 600; opacity: 0.4; }
         .ach-card.unlocked .ach-title-text { opacity: 1; }
-        .ach-desc-text { font-size: 0.75rem; color: var(--text-muted); margin-top: 1px; }
+        .ach-desc-text { font-size: 0.75rem; color: var(--text-muted); }
 
-        /* --- КАЛЕНДАРЬ СТИЛЬ --- */
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-weight: 500; }
-        .cal-nav-btn { background: transparent; border: none; color: var(--text-main); font-size: 1.1rem; cursor: pointer; padding: 0 10px; }
+        .cal-nav-btn { background: transparent; border: none; color: var(--text-main); font-size: 1.1rem; cursor: pointer; }
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
-        .cal-day-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
-        .cal-cell { aspect-ratio: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 0.85rem; border-radius: 50%; cursor: pointer; position: relative; transition: all 0.2s; }
-        .cal-cell:hover { background: var(--circle-bg); }
+        .cal-day-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
+        .cal-cell { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; font-size: 0.85rem; border-radius: 50%; cursor: pointer; position: relative; }
         .cal-cell.has-tasks::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; background: rgba(120, 119, 198, 0.8); border-radius: 50%; }
-        body.light-theme .cal-cell.has-tasks::after { background: rgba(0, 0, 0, 0.4); }
         .cal-cell.selected { background: var(--cal-active) !important; color: var(--cal-active-text) !important; font-weight: 600; }
         .cal-cell.empty { pointer-events: none; opacity: 0; }
 
-        /* СТИЛИ ДНЕВНИКА */
-        .diary-status-tag { display: inline-block; font-size: 0.65rem; background: rgba(34, 197, 94, 0.15); color: #4ade80; padding: 2px 8px; border-radius: 8px; margin-top: 4px; font-weight: 500; }
+        .diary-status-tag { display: inline-block; font-size: 0.65rem; background: rgba(34, 197, 94, 0.15); color: #4ade80; padding: 2px 8px; border-radius: 8px; margin-top: 4px; }
         textarea.diary-area { width: 100%; height: 160px; resize: none; line-height: 1.5; font-size: 0.95rem; }
     </style>
 </head>
 <body>
-
-    <div class="splash-screen" id="splash-layer">
+<https://jirtcalmrvhoaeptigrn.supabase.co
+    <sb_publishable_Qd-Dv5QmMFMeN46R3Hb2FQ_0RnajUE1
+sb_secret_91XPEGVZnD5CrMF9_0vzpg_UmWJkY2gdiv class="splash-screen" id="splash-layer">
         <div class="splash-logo-container">
             <div class="splash-ring"></div>
             <div style="font-size: 1.6rem; font-weight: 200;">Circle</div>
@@ -258,7 +235,6 @@
     </div>
 
     <div class="app-container">
-
         <div class="glass-panel hero-stats">
             <div class="main-circle-container">
                 <svg class="progress-ring" width="115" height="115">
@@ -269,7 +245,7 @@
             </div>
             <div class="main-text-stats">
                 <div class="stat-label">Ранг аккаунта</div>
-                <div class="stat-value" style="font-size: 1.2rem; font-weight: 300;" id="main-sphere-status">Новичок</div>
+                <div class="stat-value" style="font-size: 1.2rem; font-weight: 300;" id="main-sphere-status">Загрузка...</div>
                 <div class="stat-label">Прогресс ядра</div>
                 <div id="main-xp-text" style="font-size: 0.8rem; color: var(--text-muted);">0 / 100 XP</div>
             </div>
@@ -351,9 +327,13 @@
             <h3 id="quests-header-text">Активные цели</h3>
             <div id="quests-list"></div>
         </div>
+
+        <div class="quests-container" style="margin-top: 24px;">
+            <h3 style="color: var(--text-muted); opacity: 0.7;">Выполнено сегодня (Откат целей)</h3>
+            <div id="completed-quests-list"></div>
+        </div>
         
         <div class="credits-footer">by KULISINSKIY</div>
-
     </div>
 
     <div class="modal-overlay" id="ach-modal">
@@ -366,10 +346,10 @@
 
     <div class="modal-overlay" id="diary-modal">
         <div class="modal-box" style="max-width: 400px; width: 90%; text-align: left;">
-            <h4 style="margin-bottom: 4px;">Дневник мыслей</h4>
-            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;" id="diary-date-label">12 января</div>
+            <h4>Дневник мыслей</h4>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;" id="diary-date-label">Загрузка...</div>
             <div class="input-group">
-                <textarea class="diary-area" id="diary-textarea" placeholder="Запиши свои инсайты, итоги дня или важные мысли..."></textarea>
+                <textarea class="diary-area" id="diary-textarea" placeholder="Запиши свои инсайты..."></textarea>
                 <button class="main-btn" onclick="saveDiaryEntry()">Сохранить заметку</button>
                 <button class="close-ach-btn" onclick="closeDiaryModal()" style="background: transparent; color: var(--text-main); margin-top: 4px;">Закрыть</button>
             </div>
@@ -397,21 +377,19 @@
     </div>
 
     <script>
-        // ГАРАНТИРОВАННОЕ СКРЫТИЕ ЗАСТАВКИ ЧЕРЕЗ 1.5 СЕКУНДЫ
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const splash = document.getElementById('splash-layer');
-                if (splash) splash.classList.add('hidden');
-            }, 1500);
-        });
+        // === НАСТРОЙКА КЛЮЧЕЙ SUPABASE ===
+        const SUPABASE_URL = "ВСТАВЬ_СЮДА_PROJECT_URL";
+        const SUPABASE_KEY = "ВСТАВЬ_СЮДА_ANON_PUBLIC_KEY";
 
-        // Безопасное чтение базового состояния (защита от краша при парсинге)
-        let state;
-        try {
-            state = JSON.parse(localStorage.getItem('rpg_glass_v2.0_state')) || createDefaultState();
-        } catch(e) {
-            state = createDefaultState();
+        let telegramId = localStorage.getItem('circle_lf_tg_id');
+        if(!telegramId) {
+            telegramId = prompt("Введите ваш Telegram ID для синхронизации прогресса:") || "test_user";
+            localStorage.setItem('circle_lf_tg_id', telegramId);
         }
+
+        let state = createDefaultState();
+        let diaryNotes = {};
+        let quests = [];
 
         function createDefaultState() {
             return {
@@ -425,25 +403,45 @@
             };
         }
 
-        // Безопасное чтение дневника
-        let diaryNotes = {};
-        try {
-            diaryNotes = JSON.parse(localStorage.getItem('circle_lf_diary_v1')) || {};
-        } catch(e) {
-            diaryNotes = {};
+        async function loadFromCloud() {
+            if(SUPABASE_URL.includes("ВСТАВЬ_СЮДА")) {
+                try {
+                    state = JSON.parse(localStorage.getItem('rpg_glass_v2.0_state')) || createDefaultState();
+                    diaryNotes = JSON.parse(localStorage.getItem('circle_lf_diary_v1')) || {};
+                    quests = JSON.parse(localStorage.getItem('rpg_glass_v2.0_quests')) || [];
+                } catch(e) {}
+                hideSplash(); updateUI(); return;
+            }
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/user_progress?telegram_id=eq.${telegramId}`, {
+                    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+                });
+                const data = await response.json();
+                if(data && data.length > 0) {
+                    state = data[0].game_state || createDefaultState();
+                    quests = data[0].quests_state || [];
+                    diaryNotes = data[0].diary_state || {};
+                }
+            } catch(e) { console.error(e); }
+            hideSplash(); updateUI();
         }
 
-        // Безопасная функция очистки спецсимволов для HTML-вывода (чтобы длинный текст с кавычками не ломал разметку)
-        function escapeHtml(text) {
-            if (!text) return '';
-            return text
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;")
-                .replace(/\n/g, " ");
+        async function saveToCloud() {
+            localStorage.setItem('rpg_glass_v2.0_state', JSON.stringify(state));
+            localStorage.setItem('rpg_glass_v2.0_quests', JSON.stringify(quests));
+            localStorage.setItem('circle_lf_diary_v1', JSON.stringify(diaryNotes));
+            if(SUPABASE_URL.includes("ВСТАВЬ_СЮДА")) return;
+            try {
+                await fetch(`${SUPABASE_URL}/rest/v1/user_progress`, {
+                    method: "POST",
+                    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
+                    body: JSON.stringify({ telegram_id: telegramId, game_state: state, quests_state: quests, diary_state: diaryNotes, updated_at: new Date().toISOString() })
+                });
+            } catch(e) { console.error(e); }
         }
+
+        function hideSplash() { setTimeout(() => { const splash = document.getElementById('splash-layer'); if (splash) splash.classList.add('hidden'); }, 1000); }
+        function escapeHtml(text) { if (!text) return ''; return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;").replace(/\n/g, " "); }
 
         const achDatabase = [
             { id: 0, icon: "🌱", title: "Первый триумф", desc: "Успешно закройте вашу самую первую цель" },
@@ -457,18 +455,11 @@
             { id: 8, icon: "🤝", title: "Баланс стихий", desc: "Поднимите абсолютно все 4 сферы до 2 уровня" },
             { id: 9, icon: "👑", title: "Укрепление ядра", desc: "Прокачайте общий ранг аккаунта до 5 уровня" },
             { id: 10, icon: "🔮", title: "Высший разум", desc: "Прокачайте общий ранг аккаунта до 10 уровня" },
-            { id: 11, icon: "🎨", title: "Свой путь", desc: "Переименуйте любую стандартную сферу прокачки" }
+            { id: 11, icon: "🎨", title: "Свой путь", desc: "Переименовайте любую стандартную сферу прокачки" }
         ];
 
         let currentTheme = localStorage.getItem('rpg_graphite_theme_mode_v4') || 'dark';
         if (currentTheme === 'light') { document.body.classList.add('light-theme'); }
-
-        let quests = [];
-        try {
-            quests = JSON.parse(localStorage.getItem('rpg_glass_v2.0_quests')) || [];
-        } catch(e) {
-            quests = [];
-        }
 
         let today = new Date();
         let currentCalYear = today.getFullYear();
@@ -476,24 +467,9 @@
         let selectedDateStr = today.toISOString().split('T')[0];
 
         function toggleTheme() {
-            if (document.body.classList.contains('light-theme')) {
-                document.body.classList.remove('light-theme');
-                localStorage.setItem('rpg_graphite_theme_mode_v4', 'dark');
-            } else {
-                document.body.classList.add('light-theme');
-                localStorage.setItem('rpg_graphite_theme_mode_v4', 'light');
-            }
+            if (document.body.classList.contains('light-theme')) { document.body.classList.remove('light-theme'); localStorage.setItem('rpg_graphite_theme_mode_v4', 'dark'); }
+            else { document.body.classList.add('light-theme'); localStorage.setItem('rpg_graphite_theme_mode_v4', 'light'); }
             updateUI();
-        }
-
-        function saveGame() {
-            try {
-                localStorage.setItem('rpg_glass_v2.0_state', JSON.stringify(state));
-                localStorage.setItem('rpg_glass_v2.0_quests', JSON.stringify(quests));
-                localStorage.setItem('circle_lf_diary_v1', JSON.stringify(diaryNotes));
-            } catch(e) {
-                console.error("Превышен лимит памяти хранилища смартфона!");
-            }
         }
 
         function saveSphereNames() {
@@ -501,254 +477,125 @@
             for(let i=0; i<4; i++) {
                 let oldName = state.spheres[i].name;
                 let newName = document.getElementById(`sphere-name-${i}`).value;
-                if(oldName !== newName) {
-                    state.spheres[i].name = newName;
-                    changed = true;
-                }
+                if(oldName !== newName) { state.spheres[i].name = newName; changed = true; }
             }
-            if(changed) triggerAchievement(11);
-            saveGame();
-            updateDropdowns();
+            if(changed) triggerAchievement(11); saveToCloud(); updateDropdowns();
         }
 
-        function updateDropdowns() {
-            for(let i=0; i<4; i++) {
-                const el = document.getElementById(`opt-${i}`);
-                if (el) el.innerText = state.spheres[i].name;
-            }
-        }
-
-        function setCircleProgress(elementId, radius, percent) {
-            const circle = document.getElementById(elementId);
-            if (!circle) return;
-            const circumference = 2 * Math.PI * radius;
-            circle.style.strokeDasharray = circumference + ' ' + circumference;
-            const offset = circumference - (percent / 100 * circumference);
-            circle.style.strokeDashoffset = offset;
-        }
-
-        function triggerAchievement(id) {
-            if (!state.unlockedAchs.includes(id)) {
-                state.unlockedAchs.push(id);
-                saveGame();
-                setTimeout(() => {
-                    showModal("🏆 ДОСТИЖЕНИЕ ОТКРЫТО!", `Вы разблокировали: "${achDatabase[id].title}"`);
-                }, 600);
-            }
-        }
-
-        function evaluateAchievements() {
-            if (state.totalCompleted >= 1) triggerAchievement(0);
-            if (state.totalCompleted >= 5) triggerAchievement(1);
-            if (state.totalCompleted >= 25) triggerAchievement(2);
-            if (state.medCompleted >= 10) triggerAchievement(3);
-            if (state.hardCompleted >= 3) triggerAchievement(4);
-            if (state.hardCompleted >= 10) triggerAchievement(5);
-            
-            let lvls = state.spheres.map(s => s.level);
-            if (Math.max(...lvls) >= 3) triggerAchievement(6);
-            if (Math.max(...lvls) >= 5) triggerAchievement(7);
-            if (Math.min(...lvls) >= 2) triggerAchievement(8);
-            
-            if (state.mainLevel >= 5) triggerAchievement(9);
-            if (state.mainLevel >= 10) triggerAchievement(10);
-        }
-
-        function buildAchievementsUI() {
-            const container = document.getElementById('ach-list-container');
-            if(!container) return;
-            container.innerHTML = '';
-            achDatabase.forEach(ach => {
-                const isUnlocked = state.unlockedAchs.includes(ach.id);
-                container.innerHTML += `
-                    <div class="ach-card ${isUnlocked ? 'unlocked' : ''}">
-                        <div class="ach-icon-box">${ach.icon}</div>
-                        <div class="ach-info-box">
-                            <div class="ach-title-text">${ach.title}</div>
-                            <div class="ach-desc-text">${ach.desc}</div>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
+        function updateDropdowns() { for(let i=0; i<4; i++) { const el = document.getElementById(`opt-${i}`); if (el) el.innerText = state.spheres[i].name; } }
+        function setCircleProgress(elementId, radius, percent) { const circle = document.getElementById(elementId); if (!circle) return; const circumference = 2 * Math.PI * radius; circle.style.strokeDasharray = circumference + ' ' + circumference; circle.style.strokeDashoffset = circumference - (percent / 100 * circumference); }
         function renderCalendar() {
             const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-            const titleEl = document.getElementById('cal-month-title');
-            if(titleEl) titleEl.innerText = monthNames[currentCalMonth] + " " + currentCalYear;
-            
-            const container = document.getElementById('cal-grid-container');
-            if(!container) return;
-            container.innerHTML = '';
-
-            const labels = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
-            labels.forEach(l => container.innerHTML += `<div class="cal-day-label">${l}</div>`);
-
+            document.getElementById('cal-month-title').innerText = monthNames[currentCalMonth] + " " + currentCalYear;
+            const container = document.getElementById('cal-grid-container'); container.innerHTML = '';
+            const labels = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]; labels.forEach(l => container.innerHTML += `<div class="cal-day-label">${l}</div>`);
             let firstDay = new Date(currentCalYear, currentCalMonth, 1).getDay();
             let daysInMonth = new Date(currentCalYear, currentCalMonth + 1, 0).getDate();
-            
             let startOffset = firstDay === 0 ? 6 : firstDay - 1;
-
-            for (let i = 0; i < startOffset; i++) {
-                container.innerHTML += `<div class="cal-cell empty"></div>`;
-            }
-
+            for (let i = 0; i < startOffset; i++) container.innerHTML += `<div class="cal-cell empty"></div>`;
             for (let day = 1; daysInMonth >= day; day++) {
-                let monthStr = String(currentCalMonth + 1).padStart(2, '0');
-                let dayStr = String(day).padStart(2, '0');
-                let cellDateStr = currentCalYear + "-" + monthStr + "-" + dayStr;
-
+                let monthStr = String(currentCalMonth + 1).padStart(2, '0'); let dayStr = String(day).padStart(2, '0'); let cellDateStr = currentCalYear + "-" + monthStr + "-" + dayStr;
                 let hasTasks = quests.some(q => q.date === cellDateStr) || !!diaryNotes[cellDateStr];
                 let isSelected = selectedDateStr === cellDateStr;
-
-                container.innerHTML += `
-                    <div class="cal-cell ${isSelected ? 'selected' : ''} ${hasTasks ? 'has-tasks' : ''}" 
-                         onclick="selectDate('${cellDateStr}')">
-                        ${day}
-                    </div>
-                `;
+                container.innerHTML += `<div class="cal-cell ${isSelected ? 'selected' : ''} ${hasTasks ? 'has-tasks' : ''}" onclick="selectDate('${cellDateStr}')">${day}</div>`;
             }
         }
-
-        function changeMonth(direction) {
-            currentCalMonth += direction;
-            if (currentCalMonth > 11) { currentCalMonth = 0; currentCalYear++; }
-            if (currentCalMonth < 0) { currentCalMonth = 11; currentCalYear--; }
-            renderCalendar();
-        }
-
-        function selectDate(dateStr) {
-            selectedDateStr = dateStr;
-            renderCalendar();
-            updateUI();
-        }
-
-        /* ЛОГИКА ДНЕВНИКА */
-        function openDiaryModal() {
-            let d = new Date(selectedDateStr);
-            let formattedDate = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-            
-            document.getElementById('diary-date-label').innerText = "Мысли за " + formattedDate;
-            document.getElementById('diary-textarea').value = diaryNotes[selectedDateStr] || "";
-            
-            document.getElementById('diary-modal').classList.add('active');
-        }
-
-        function closeDiaryModal() {
-            document.getElementById('diary-modal').classList.remove('active');
-        }
-
-        function saveDiaryEntry() {
-            const text = document.getElementById('diary-textarea').value.trim();
-            if (text) {
-                diaryNotes[selectedDateStr] = text;
-            } else {
-                delete diaryNotes[selectedDateStr];
-            }
-            saveGame();
-            closeDiaryModal();
-            updateUI();
-        }
+        function changeMonth(direction) { currentCalMonth += direction; if (currentCalMonth > 11) { currentCalMonth = 0; currentCalYear++; } if (currentCalMonth < 0) { currentCalMonth = 11; currentCalYear--; } renderCalendar(); }
+        function selectDate(dateStr) { selectedDateStr = dateStr; renderCalendar(); updateUI(); }
+        function openDiaryModal() { let d = new Date(selectedDateStr); document.getElementById('diary-date-label').innerText = "Мысли за " + d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }); document.getElementById('diary-textarea').value = diaryNotes[selectedDateStr] || ""; document.getElementById('diary-modal').classList.add('active'); }
+        function closeDiaryModal() { document.getElementById('diary-modal').classList.remove('active'); }
+        function saveDiaryEntry() { const text = document.getElementById('diary-textarea').value.trim(); if (text) diaryNotes[selectedDateStr] = text; else delete diaryNotes[selectedDateStr]; saveToCloud(); closeDiaryModal(); updateUI(); }
 
         function updateUI() {
             const isLight = document.body.classList.contains('light-theme');
-            const themeBtnIcon = document.getElementById('theme-btn-icon');
-            const themeBtnText = document.getElementById('theme-btn-text');
-            if(themeBtnIcon) themeBtnIcon.innerText = isLight ? "🌙" : "☀️";
-            if(themeBtnText) themeBtnText.innerText = isLight ? "Темная тема" : "Светлая тема";
+            document.getElementById('theme-btn-icon').innerText = isLight ? "🌙" : "☀️";
+            document.getElementById('theme-btn-text').innerText = isLight ? "Темная тема" : "Светлая тема";
 
-            const mainLvlEl = document.getElementById('main-level');
-            const mainXpEl = document.getElementById('main-xp-text');
-            if(mainLvlEl) mainLvlEl.innerText = state.mainLevel;
-            if(mainXpEl) mainXpEl.innerText = state.mainXp + " / " + state.mainNextLevelXp + " XP";
-            
-            const mainPercent = (state.mainXp / state.mainNextLevelXp) * 100;
-            setCircleProgress('main-xp-circle', 52, mainPercent);
+            document.getElementById('main-level').innerText = state.mainLevel;
+            document.getElementById('main-xp-text').innerText = state.mainXp + " / " + state.mainNextLevelXp + " XP";
+            setCircleProgress('main-xp-circle', 52, (state.mainXp / state.mainNextLevelXp) * 100);
 
             let status = "Новичок";
             if(state.mainLevel >= 5) status = "Специалист";
             if(state.mainLevel >= 10) status = "Мастер линейки";
-            if(state.mainLevel >= 20) status = "Легендарный Разум";
-            
-            const statusEl = document.getElementById('main-sphere-status');
-            if(statusEl) statusEl.innerText = status;
+            document.getElementById('main-sphere-status').innerText = status;
 
             state.spheres.forEach((sphere, i) => {
-                const nameInp = document.getElementById(`sphere-name-${i}`);
-                const lvlEl = document.getElementById(`sphere-lvl-${i}`);
-                const xpEl = document.getElementById(`sphere-xp-${i}`);
-                
-                if(nameInp) nameInp.value = sphere.name;
-                if(lvlEl) lvlEl.innerText = sphere.level;
-                if(xpEl) xpEl.innerText = sphere.xp + "/" + sphere.nextXp + " XP";
-                
-                const spherePercent = (sphere.xp / sphere.nextXp) * 100;
-                setCircleProgress(`sphere-circle-${i}`, 32, spherePercent);
+                document.getElementById(`sphere-name-${i}`).value = sphere.name;
+                document.getElementById(`sphere-lvl-${i}`).innerText = sphere.level;
+                document.getElementById(`sphere-xp-${i}`).innerText = sphere.xp + "/" + sphere.nextXp + " XP";
+                setCircleProgress(`sphere-circle-${i}`, 32, (sphere.xp / sphere.nextXp) * 100);
             });
 
-            updateDropdowns();
-            evaluateAchievements();
+            updateDropdowns(); if (state.totalCompleted > 0) { if (typeof state.easyCompleted === 'undefined') { state.easyCompleted = 0; state.medCompleted = 0; state.hardCompleted = 0; } }
 
             let d = new Date(selectedDateStr);
-            let formattedDate = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
-            const headerTxt = document.getElementById('quests-header-text');
-            if(headerTxt) headerTxt.innerText = "Цели на " + formattedDate;
+            document.getElementById('quests-header-text').innerText = "Цели на " + d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
 
             const list = document.getElementById('quests-list');
-            if(!list) return;
+            const compList = document.getElementById('completed-quests-list');
             list.innerHTML = '';
+            compList.innerHTML = '';
             
-            let filteredQuests = quests.filter(q => q.date === selectedDateStr);
-
-            // Безопасный вывод превью дневника с защитой от опасных символов
             if (diaryNotes[selectedDateStr]) {
-                let safeText = escapeHtml(diaryNotes[selectedDateStr]);
                 list.innerHTML += `
                     <div class="quest-item" style="border-left: 3px solid #4ade80; cursor: pointer;" onclick="openDiaryModal()">
                         <div style="width: 100%;">
-                            <div class="quest-title" style="font-size: 0.9rem; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px;">
-                                "${safeText}"
-                            </div>
+                            <div class="quest-title" style="font-size: 0.9rem; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px;">"${escapeHtml(diaryNotes[selectedDateStr])}"</div>
                             <div class="diary-status-tag">📖 Дневник заполнен</div>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             }
 
-            if(filteredQuests.length === 0 && !diaryNotes[selectedDateStr]) {
-                list.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 30px; font-size: 0.9rem; font-style: italic;">На этот день задач нет. Свободное время.</div>';
+            let filteredActive = quests.filter(q => q.date === selectedDateStr && !q.completed);
+            let filteredDone = quests.filter(q => q.date === selectedDateStr && q.completed);
+
+            if(filteredActive.length === 0 && !diaryNotes[selectedDateStr]) {
+                list.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 24px; font-size: 0.9rem; font-style: italic;">На этот день активных задач нет.</div>';
+            }
+            if(filteredDone.length === 0) {
+                compList.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 16px; font-size: 0.85rem; font-style: italic;">Выполненных задач пока нет.</div>';
             }
 
             quests.forEach((quest, index) => {
                 if (quest.date !== selectedDateStr) return;
-
-                let rewards = "+50 XP";
-                if(quest.difficulty === 'easy') rewards = "+20 XP";
-                if(quest.difficulty === 'hard') rewards = "+100 XP";
-
-                const sphereName = state.spheres[quest.sphereId]?.name || "Сфера";
-
-                list.innerHTML += `
-                    <div class="quest-item" id="quest-${index}">
-                        <div>
-                            <div class="quest-title">${quest.text}</div>
+                let rewards = quest.difficulty === 'easy' ? "+20 XP" : quest.difficulty === 'hard' ? "+100 XP" : "+50 XP";
+                
+                if(!quest.completed) {
+                    // Рендер активных целей
+                    list.innerHTML += `
+                        <div class="quest-item" id="quest-${index}">
                             <div>
-                                <span class="quest-tag">${sphereName}</span>
-                                <span class="quest-date-tag">📅 ${formattedDate}</span>
-                                <span style="font-size:0.75rem; color: var(--text-muted); margin-left: 6px;">${rewards}</span>
+                                <div class="quest-title">${quest.text}</div>
+                                <div>
+                                    <span class="quest-tag">${state.spheres[quest.sphereId]?.name || "Сфера"}</span>
+                                    <span style="font-size:0.75rem; color: var(--text-muted); margin-left: 6px;">${rewards}</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="action-wrapper">
-                            <button class="check-btn" onclick="toggleConfirm(${index}, event)">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-                            </button>
-                            <div class="confirm-popup" id="popup-${index}">
-                                <button class="confirm-btn no" onclick="toggleConfirm(${index}, event)">Нет</button>
-                                <button class="confirm-btn yes" onclick="completeQuest(${index})">Готово</button>
+                            <div class="action-wrapper">
+                                <button class="check-btn" onclick="toggleConfirm(${index}, event)">✓</button>
+                                <div class="confirm-popup" id="popup-${index}">
+                                    <button class="confirm-btn no" onclick="toggleConfirm(${index}, event)">Нет</button>
+                                    <button class="confirm-btn yes" onclick="completeQuest(${index})">Да</button>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                `;
+                        </div>`;
+                } else {
+                    // Рендер выполненных целей (История с возможностью ОТКАТА)
+                    compList.innerHTML += `
+                        <div class="quest-item" id="quest-${index}" style="opacity: 0.65; border-left: 2px dashed var(--text-muted);">
+                            <div>
+                                <div class="quest-title" style="text-decoration: line-through; color: var(--text-muted);">${quest.text}</div>
+                                <div>
+                                    <span class="quest-tag">${state.spheres[quest.sphereId]?.name || "Сфера"}</span>
+                                    <span style="font-size:0.75rem; color: var(--text-muted); margin-left: 6px;">${rewards}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="check-btn" onclick="undoQuest(${index})" title="Отменить выполнение задачи" style="border-color: var(--text-muted); font-size: 0.9rem;">↩️</button>
+                            </div>
+                        </div>`;
+                }
             });
         }
 
@@ -758,92 +605,99 @@
             const difficulty = document.getElementById('quest-difficulty').value;
             if (!input || !input.value.trim()) return;
 
-            quests.push({ text: input.value, sphereId: sphereId, difficulty: difficulty, date: selectedDateStr });
-            input.value = '';
-            saveGame();
-            updateUI();
+            quests.push({ text: input.value, sphereId: sphereId, difficulty: difficulty, date: selectedDateStr, completed: false });
+            input.value = ''; saveToCloud(); updateUI();
         }
 
         function toggleConfirm(index, event) {
             event.stopPropagation();
-            document.querySelectorAll('.confirm-popup').forEach((p, idx) => {
-                if(idx !== index) p.classList.remove('active');
-            });
-            const popup = document.getElementById(`popup-${index}`);
-            if(popup) popup.classList.toggle('active');
+            document.querySelectorAll('.confirm-popup').forEach((p, idx) => { if(idx !== index) p.classList.remove('active'); });
+            document.getElementById(`popup-${index}`).classList.toggle('active');
         }
 
-        document.addEventListener('click', () => {
-            document.querySelectorAll('.confirm-popup').forEach(p => p.classList.remove('active'));
-        });
+        document.addEventListener('click', () => document.querySelectorAll('.confirm-popup').forEach(p => p.classList.remove('active')));
 
         function completeQuest(index) {
-            const questEl = document.getElementById(`quest-${index}`);
-            if(questEl) questEl.classList.add('fade-out');
-
+            document.getElementById(`quest-${index}`).classList.add('fade-out');
             setTimeout(() => {
                 const quest = quests[index];
-                if(!quest) return;
-                let xpReward = 50;
-
-                if (quest.difficulty === 'easy') { xpReward = 20; state.easyCompleted++; }
-                if (quest.difficulty === 'medium') { state.medCompleted++; }
-                if (quest.difficulty === 'hard') { xpReward = 100; state.hardCompleted++; }
-
-                state.totalCompleted += 1;
-
-                let targetSphere = state.spheres[quest.sphereId];
-                targetSphere.xp += xpReward;
-
-                let leveledUpSphere = false;
-                if (targetSphere.xp >= targetSphere.nextXp) {
-                    targetSphere.xp -= targetSphere.nextXp;
-                    targetSphere.level++;
-                    targetSphere.nextXp = Math.floor(targetSphere.nextXp * 1.25);
-                    leveledUpSphere = true;
-                }
-
-                state.mainXp += Math.floor(xpReward * 0.7);
+                let xpReward = quest.difficulty === 'easy' ? 20 : quest.difficulty === 'hard' ? 100 : 50;
                 
+                if(quest.difficulty === 'easy') state.easyCompleted++;
+                if(quest.difficulty === 'medium') state.medCompleted++;
+                if(quest.difficulty === 'hard') state.hardCompleted++;
+                state.totalCompleted++;
+
+                let ts = state.spheres[quest.sphereId];
+                ts.xp += xpReward;
+                let leveledUpSphere = false;
+                if (ts.xp >= ts.nextXp) { ts.xp -= ts.nextXp; ts.level++; ts.nextXp = Math.floor(ts.nextXp * 1.25); leveledUpSphere = true; }
+
+                let mainReward = Math.floor(xpReward * 0.7);
+                state.mainXp += mainReward;
                 let leveledUpMain = false;
-                if (state.mainXp >= state.mainNextLevelXp) {
-                    state.mainXp -= state.mainNextLevelXp;
-                    state.mainLevel++;
-                    state.mainNextLevelXp = Math.floor(state.mainNextLevelXp * 1.35);
-                    leveledUpMain = true;
-                }
+                if (state.mainXp >= state.mainNextLevelXp) { state.mainXp -= state.mainNextLevelXp; state.mainLevel++; state.mainNextLevelXp = Math.floor(state.mainNextLevelXp * 1.35); leveledUpMain = true; }
 
-                if (leveledUpMain) {
-                    showModal("ГЛОБАЛЬНЫЙ ЛЕВЕЛАП!", "Ваш общий ранг ядра вырос до " + state.mainLevel + " уровня.");
-                } else if (leveledUpSphere) {
-                    showModal("Сфера прокачана!", "Сфера \"" + targetSphere.name + "\" развилась до " + targetSphere.level + " уровня!");
-                }
+                if (leveledUpMain) { showModal("ГЛОБАЛЬНЫЙ ЛЕВЕЛАП!", "Общий ранг вырос до " + state.mainLevel + " уровня."); }
+                else if (leveledUpSphere) { showModal("Сфера прокачана!", `"${ts.name}" развилась до ${ts.level} уровня!`); }
 
-                quests.splice(index, 1);
-                saveGame();
-                updateUI();
+                quest.completed = true;
+                saveToCloud(); updateUI();
             }, 400);
         }
 
-        function showModal(title, desc) {
-            const t = document.getElementById('modal-title');
-            const d = document.getElementById('modal-desc');
-            if(t) t.innerText = title;
-            if(d) d.innerText = desc;
-            const m = document.getElementById('levelup-modal');
-            if(m) m.classList.add('active');
+        // КЛЮЧЕВАЯ ФУНКЦИЯ: ПОЛНЫЙ МАТЕМАТИЧЕСКИЙ ОТКАТ ЗАДАЧИ
+        function undoQuest(index) {
+            const quest = quests[index];
+            if(!quest) return;
+            
+            let xpReward = quest.difficulty === 'easy' ? 20 : quest.difficulty === 'hard' ? 100 : 50;
+
+            // 1. Откат счетчиков
+            if(quest.difficulty === 'easy' && state.easyCompleted > 0) state.easyCompleted--;
+            if(quest.difficulty === 'medium' && state.medCompleted > 0) state.medCompleted--;
+            if(quest.difficulty === 'hard' && state.hardCompleted > 0) state.hardCompleted--;
+            if(state.totalCompleted > 0) state.totalCompleted--;
+
+            // 2. Откат опыта сферы
+            let ts = state.spheres[quest.sphereId];
+            ts.xp -= xpReward;
+            
+            // Если ушли в минус по опыту — значит, откатываем уровень сферы назад!
+            if (ts.xp < 0 && ts.level > 0) {
+                ts.level--;
+                ts.nextXp = Math.ceil(ts.nextXp / 1.25);
+                ts.xp = ts.nextXp + ts.xp; // Восстанавливаем остаток опыта
+            } else if (ts.xp < 0) {
+                ts.xp = 0; // На нулевом уровне опыт ниже нуля не падает
+            }
+
+            // 3. Откат основного опыта аккаунта (70% от награды)
+            let mainReward = Math.floor(xpReward * 0.7);
+            state.mainXp -= mainReward;
+            
+            // Если ушли в минус по основному опыту — откатываем общий уровень назад!
+            if (state.mainXp < 0 && state.mainLevel > 0) {
+                state.mainLevel--;
+                state.mainNextLevelXp = Math.ceil(state.mainNextLevelXp / 1.35);
+                state.mainXp = state.mainNextLevelXp + state.mainXp;
+            } else if (state.mainXp < 0) {
+                state.mainXp = 0;
+            }
+
+            // 4. Переводим таск обратно в активные
+            quest.completed = false;
+            saveToCloud(); updateUI();
         }
 
-        function closeModal() { 
-            const m = document.getElementById('levelup-modal');
-            if(m) m.classList.remove('active'); 
-        }
-        function openAchModal() { buildAchievementsUI(); const m = document.getElementById('ach-modal'); if(m) m.classList.add('active'); }
-        function closeAchModal() { const m = document.getElementById('ach-modal'); if(m) m.classList.remove('active'); }
-        function openCalModal() { renderCalendar(); const m = document.getElementById('cal-modal'); if(m) m.classList.add('active'); }
-        function closeCalModal() { const m = document.getElementById('cal-modal'); if(m) m.classList.remove('active'); }
+        function showModal(title, desc) { document.getElementById('modal-title').innerText = title; document.getElementById('modal-desc').innerText = desc; document.getElementById('levelup-modal').classList.add('active'); }
+        function closeModal() { document.getElementById('levelup-modal').classList.remove('active'); }
+        function openAchModal() { buildAchievementsUI(); document.getElementById('ach-modal').classList.add('active'); }
+        function closeAchModal() { document.getElementById('ach-modal').classList.remove('active'); }
+        function openCalModal() { renderCalendar(); document.getElementById('cal-modal').classList.add('active'); }
+        function closeCalModal() { document.getElementById('cal-modal').classList.remove('active'); }
 
-        updateUI();
+        window.onload = loadFromCloud;
     </script>
 </body>
 </html>
