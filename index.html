@@ -95,7 +95,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 0.6; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1); } }
 
-        .app-container { width: 100%; max-width: 440px; z-index: 1; position: relative; }
+        .app-container { width: 100%; max-width: 440px; z-index: 10; position: relative; }
         .theme-switcher { width: 100%; max-width: 440px; display: flex; justify-content: flex-end; margin-bottom: 20px; }
 
         .toggle-style-btn, .action-btn {
@@ -103,7 +103,7 @@
             cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 500; box-shadow: var(--shadow);
             border: 1px solid transparent; position: relative; backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
         }
-        .toggle-style-btn::before, .glass-panel::before, .action-btn::before, .ach-card::before {
+        .toggle-style-btn::before, .glass-panel::before, .action-btn::before, .ach-card::before, .add-sphere-trigger::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: inherit; padding: 1px;
             background: var(--border-gradient); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
@@ -128,7 +128,8 @@
         .stat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 3px; }
         .stat-value { font-size: 1.25rem; font-weight: 400; margin-bottom: 4px; }
 
-        .spheres-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .spheres-container-wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; margin-bottom: 24px; gap: 16px; }
+        .spheres-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; }
         .sphere-card { background: var(--panel-bg); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; box-shadow: var(--shadow); }
         .sphere-card::before { content: ''; position: absolute; top:0; left:0; right:0; bottom:0; border-radius: inherit; padding: 1px; background: var(--border-gradient); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
         .sphere-circle-container { position: relative; width: 70px; height: 70px; display: flex; justify-content: center; align-items: center; margin-bottom: 8px; }
@@ -142,6 +143,16 @@
         .sphere-name-input { background: transparent; border: none; color: var(--text-main); font-size: 0.85rem; text-align: center; width: 100%; font-weight: 400; letter-spacing: 0.3px; padding: 2px; border-bottom: 1px solid transparent; cursor: pointer; transition: color 0.3s; }
         .sphere-name-input:focus { border-bottom: 1px solid var(--text-main); cursor: text; }
         .sphere-xp-text { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; }
+
+        .add-sphere-trigger {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: var(--panel-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            box-shadow: var(--shadow); display: flex; justify-content: center; align-items: center;
+            cursor: pointer; position: relative; font-size: 1.6rem; font-weight: 200; color: var(--text-muted);
+            transition: transform 0.2s, color 0.2s;
+        }
+        .add-sphere-trigger:active { transform: scale(0.94); }
+        .add-sphere-trigger:hover { color: var(--text-main); }
 
         .credits-footer {
             text-align: center; font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
@@ -170,7 +181,6 @@
         .quest-title { font-weight: 400; font-size: 1rem; margin-bottom: 4px; }
         
         .quest-tag { display: inline-block; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; background: var(--circle-bg); padding: 2px 8px; border-radius: 8px; color: var(--text-muted); margin-top: 2px; }
-        .quest-date-tag { display: inline-block; font-size: 0.65rem; letter-spacing: 0.3px; background: rgba(120, 119, 198, 0.2); padding: 2px 8px; border-radius: 8px; color: var(--text-main); margin-top: 2px; margin-left: 4px; }
 
         .action-wrapper { position: relative; display: flex; align-items: center; }
         button.check-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.12); background: transparent; cursor: pointer; display: flex; justify-content: center; align-items: center; color: var(--text-main); }
@@ -182,7 +192,7 @@
         .confirm-btn.no { background: transparent; color: var(--bg-color); }
         .quest-item.fade-out { opacity: 0; transform: scale(0.9) translateY(-10px); }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 99999; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-box { background: var(--panel-bg); color: var(--text-main); padding: 30px; border-radius: 24px; text-align: center; max-width: 350px; width: 85%; transform: scale(0.8); transition: transform 0.3s; position: relative; box-shadow: var(--shadow); }
         .modal-overlay.active .modal-box { transform: scale(1); }
@@ -209,6 +219,11 @@
 
         .diary-status-tag { display: inline-block; font-size: 0.65rem; background: rgba(34, 197, 94, 0.15); color: #4ade80; padding: 2px 8px; border-radius: 8px; margin-top: 4px; }
         textarea.diary-area { width: 100%; height: 160px; resize: none; line-height: 1.5; font-size: 0.95rem; }
+
+        #forced-login-modal { background: rgba(7, 8, 10, 0.93); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); }
+        .auth-tabs { display: flex; gap: 10px; margin-bottom: 16px; justify-content: center; }
+        .auth-tab-btn { background: transparent; border: none; color: var(--text-muted); font-size: 0.85rem; cursor: pointer; padding: 6px 12px; border-bottom: 2px solid transparent; }
+        .auth-tab-btn.active { color: var(--text-main); border-bottom-color: var(--text-main); font-weight: 600; }
     </style>
 </head>
 <body>
@@ -253,56 +268,16 @@
             </div>
         </div>
 
-        <div class="spheres-grid">
-            <div class="sphere-card">
-                <div class="sphere-circle-container">
-                    <svg class="progress-ring" width="70" height="70">
-                        <circle class="circle-bg" cx="35" cy="35" r="32"/>
-                        <circle class="sphere-circle-progress" id="sphere-circle-0" cx="35" cy="35" r="32"/>
-                    </svg>
-                    <div class="sphere-level" id="sphere-lvl-0">0</div>
-                </div>
-                <input type="text" class="sphere-name-input" id="sphere-name-0" onchange="saveSphereNames()" value="Работа">
-                <div class="sphere-xp-text" id="sphere-xp-0">0/100 XP</div>
+        <div class="spheres-container-wrapper">
+            <div class="spheres-grid" id="spheres-container">
+                <!-- Сферы -->
             </div>
-            <div class="sphere-card">
-                <div class="sphere-circle-container">
-                    <svg class="progress-ring" width="70" height="70">
-                        <circle class="circle-bg" cx="35" cy="35" r="32"/>
-                        <circle class="sphere-circle-progress" id="sphere-circle-1" cx="35" cy="35" r="32"/>
-                    </svg>
-                    <div class="sphere-level" id="sphere-lvl-1">0</div>
-                </div>
-                <input type="text" class="sphere-name-input" id="sphere-name-1" onchange="saveSphereNames()" value="Хобби">
-                <div class="sphere-xp-text" id="sphere-xp-1">0/100 XP</div>
-            </div>
-            <div class="sphere-card">
-                <div class="sphere-circle-container">
-                    <svg class="progress-ring" width="70" height="70">
-                        <circle class="circle-bg" cx="35" cy="35" r="32"/>
-                        <circle class="sphere-circle-progress" id="sphere-circle-2" cx="35" cy="35" r="32"/>
-                    </svg>
-                    <div class="sphere-level" id="sphere-lvl-2">0</div>
-                </div>
-                <input type="text" class="sphere-name-input" id="sphere-name-2" onchange="saveSphereNames()" value="Отдых">
-                <div class="sphere-xp-text" id="sphere-xp-2">0/100 XP</div>
-            </div>
-            <div class="sphere-card">
-                <div class="sphere-circle-container">
-                    <svg class="progress-ring" width="70" height="70">
-                        <circle class="circle-bg" cx="35" cy="35" r="32"/>
-                        <circle class="sphere-circle-progress" id="sphere-circle-3" cx="35" cy="35" r="32"/>
-                    </svg>
-                    <div class="sphere-level" id="sphere-lvl-3">0</div>
-                </div>
-                <input type="text" class="sphere-name-input" id="sphere-name-3" onchange="saveSphereNames()" value="Спорт">
-                <div class="sphere-xp-text" id="sphere-xp-3">0/100 XP</div>
-            </div>
+            <div class="add-sphere-trigger" onclick="promptNewSphere()">+</div>
         </div>
 
         <div class="action-grid">
             <button class="action-btn" onclick="openCalModal()">📅 Календарь</button>
-            <button class="action-btn" onclick="openDiaryModal()">📖 Дневник мысли</button>
+            <button class="action-btn" onclick="openDiaryModal()">📖 Дневник</button>
             <button class="action-btn" onclick="openAchModal()">🏆 Достижения</button>
         </div>
 
@@ -311,22 +286,19 @@
             <div class="input-group">
                 <input type="text" id="quest-input" placeholder="What needs to be done?">
                 <select id="quest-sphere">
-                    <option value="0" id="opt-0">Работа</option>
-                    <option value="1" id="opt-1">Хобби</option>
-                    <option value="2" id="opt-2">Отдых</option>
-                    <option value="3" id="opt-3">Спорт</option>
+                    <!-- Сферы выпадают динамически -->
                 </select>
                 <select id="quest-difficulty">
                     <option value="easy">Малый фокус (+20 XP)</option>
                     <option value="medium" selected>Стандартная цель (+50 XP)</option>
-                    <option value="hard">Тяжелый вызов (+100 XP)</option>
+                    <option value="hard">Трудная задача (+100 XP)</option>
                 </select>
                 <button class="main-btn" onclick="addQuest()">Добавить задачу</button>
             </div>
         </div>
 
         <div class="quests-container">
-            <h3 id="quests-header-text">Активные цели</h3>
+            <h3 id="quests-header-text">Active goals</h3>
             <div id="quests-list"></div>
         </div>
 
@@ -342,6 +314,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛКА ДОСТИЖЕНИЙ -->
     <div class="modal-overlay" id="ach-modal">
         <div class="modal-box ach-box">
             <h4>Свиток достижений</h4>
@@ -350,9 +323,10 @@
         </div>
     </div>
 
+    <!-- МОДАЛКА ДНЕВНИКА -->
     <div class="modal-overlay" id="diary-modal">
         <div class="modal-box" style="max-width: 400px; width: 90%; text-align: left;">
-            <h4>Дневник мыслей</h4>
+            <h4>Дневник</h4>
             <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;" id="diary-date-label">Загрузка...</div>
             <div class="input-group">
                 <textarea class="diary-area" id="diary-textarea" placeholder="Запиши свои инсайты..."></textarea>
@@ -362,6 +336,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛКА КАЛЕНДАРЯ -->
     <div class="modal-overlay" id="cal-modal">
         <div class="modal-box" style="max-width: 400px; width: 90%;">
             <div class="cal-header">
@@ -374,20 +349,39 @@
         </div>
     </div>
 
+    <!-- МОДАЛКА ЛЕВЕЛАПА -->
     <div class="modal-overlay" id="levelup-modal">
         <div class="modal-box">
             <h4 id="modal-title">Новый уровень!</h4>
             <p id="modal-desc">Вы успешно продвинулись вперед.</p>
-            <button onclick="closeModal()">Продолжить</button>
+            <button class="close-ach-btn" onclick="closeModal()">Продолжить</button>
+        </div>
+    </div>
+
+    <!-- НЕУДАЛЯЕМАЯ МОДАЛКА ОБЯЗАТЕЛЬНОЙ АВТОРИЗАЦИИ С ПИН-КОДОМ -->
+    <div class="modal-overlay" id="forced-login-modal">
+        <div class="modal-box" style="max-width: 360px;">
+            <div class="auth-tabs">
+                <button class="auth-tab-btn active" id="tab-login" onclick="setAuthMode('login')">Вход</button>
+                <button class="auth-tab-btn" id="tab-register" onclick="setAuthMode('register')">Регистрация</button>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4;" id="auth-desc">Укажите ваш логин и ПИН-код для подключения к профилю.</p>
+            <div class="input-group">
+                <input type="text" id="forced-username-input" placeholder="Введите свой логин">
+                <input type="password" id="forced-pin-input" inputmode="numeric" pattern="[0-8]*" maxlength="4" placeholder="Введите 4-значный ПИН">
+                <button class="main-btn" id="auth-submit-btn" onclick="submitAuth()">Войти в систему</button>
+            </div>
         </div>
     </div>
 
     <script>
         // === НАСТРОЙКА КЛЮЧЕЙ SUPABASE ===
-        const SUPABASE_URL = "https://jirtcalmrvhoaeptigrn.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_Qd-Dv5QmMFMeN46R3Hb2FQ_0RnajUE1";
+        const SUPABASE_URL = "ВСТАВЬ_СЮДА_PROJECT_URL";
+        const SUPABASE_KEY = "ВСТАВЬ_СЮДА_ANON_PUBLIC_KEY";
 
         let telegramId = localStorage.getItem('circle_lf_tg_id');
+        let localPin = localStorage.getItem('circle_lf_local_pin');
+        let authMode = "login";
         
         let state = createDefaultState();
         let diaryNotes = {};
@@ -408,50 +402,137 @@
         function isCloudEnabled() {
             return (SUPABASE_URL && SUPABASE_KEY && !SUPABASE_URL.includes("ВСТАВЬ_СЮДА") && SUPABASE_URL.trim() !== "");
         }
+        
+        function isValidAuth(id, pin) {
+            if (!id || id.trim() === "" || !pin || pin.trim() === "") return false;
+            let checkId = id.toLowerCase().trim();
+            if (checkId === "@user" || checkId === "user" || checkId === "@test_user" || checkId === "test_user" || checkId === "@z-test-user") return false;
+            return true;
+        }
 
         async function initApp() {
-            if (!telegramId) {
-                // Пытаемся сделать красивую маску логина (@никнейм)
-                let input = prompt("Вход в систему Circle lf.\nВведите ваш Telegram ID или Никнейм:") || "test_user";
-                telegramId = input.trim().startsWith('@') ? input.trim() : '@' + input.trim();
-                localStorage.setItem('circle_lf_tg_id', telegramId);
+            // Принудительно отсекаем старые логины, если под ними нет зарегистрированного 4-значного ПИН-кода
+            if (!isValidAuth(telegramId, localPin)) {
+                localStorage.clear();
+                telegramId = null;
+                localPin = null;
+                state = createDefaultState();
+                renderSpheresUI(); 
+                updateDropdowns();
+                document.getElementById('profile-tag-label').innerText = "Профиль: Ожидание входа";
+                document.getElementById('forced-login-modal').classList.add('active');
+                hideSplash();
+                return;
             }
+            
+            loadLocally();
             await loadFromCloud();
+        }
+
+        function setAuthMode(mode) {
+            authMode = mode;
+            document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+            document.getElementById('tab-register').classList.toggle('active', mode === 'register');
+            document.getElementById('auth-desc').innerText = mode === 'login' ? "Укажите ваш логин и ПИН-код для подключения к профилю." : "Придумайте новый логин и запомните 4-значный ПИН-код.";
+            document.getElementById('auth-submit-btn').innerText = mode === 'login' ? "Войти в систему" : "Зарегистрироваться";
+        }
+
+        async function submitAuth() {
+            const userIn = document.getElementById('forced-username-input').value.trim();
+            const pinIn = document.getElementById('forced-pin-input').value.trim();
+
+            if (!userIn || pinIn.length !== 4 || isNaN(pinIn)) {
+                alert("Введите корректный логин и 4-значный цифровой ПИН-код!");
+                return;
+            }
+
+            let formattedUser = userIn.startsWith('@') ? userIn : '@' + userIn;
+
+            if (isCloudEnabled()) {
+                try {
+                    const res = await fetch(`${SUPABASE_URL}/rest/v1/user_progress?telegram_id=eq.${formattedUser}`, {
+                        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+                    });
+                    const data = await res.json();
+
+                    if (authMode === 'login') {
+                        if (data && data.length > 0) {
+                            if (data[0].pin === pinIn || data[0].pin === parseInt(pinIn)) {
+                                proceedWithAuth(formattedUser, pinIn, data[0]);
+                            } else {
+                                alert("Ошибка: Неверный ПИН-код для этого логина!");
+                            }
+                        } else {
+                            alert("Пользователь не найден. Пожалуйста, переключитесь на вкладку Регистрация.");
+                        }
+                    } else {
+                        if (data && data.length > 0) {
+                            alert("Этот логин уже занят кем-то другим!");
+                        } else {
+                            proceedWithAuth(formattedUser, pinIn, null);
+                        }
+                    }
+                } catch(e) {
+                    alert("Ошибка сети. Переключение в локальный режим.");
+                    proceedWithAuth(formattedUser, pinIn, null);
+                }
+            } else {
+                proceedWithAuth(formattedUser, pinIn, null);
+            }
+        }
+
+        function proceedWithAuth(user, pin, cloudRow) {
+            telegramId = user;
+            localPin = pin;
+            localStorage.setItem('circle_lf_tg_id', user);
+            localStorage.setItem('circle_lf_local_pin', pin);
+            document.getElementById('forced-login-modal').classList.remove('active');
+
+            if (cloudRow) {
+                state = cloudRow.game_state || createDefaultState();
+                quests = cloudRow.quests_state || [];
+                diaryNotes = cloudRow.diary_state || {};
+                hideSplash();
+                updateUI();
+            } else {
+                loadLocally();
+                saveToCloud(); 
+                hideSplash();
+                updateUI();
+            }
         }
 
         async function loadFromCloud() {
             if (!isCloudEnabled()) {
-                loadLocally(); hideSplash(); updateUI(); return;
+                hideSplash(); updateUI(); return;
             }
             try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 4000);
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/user_progress?telegram_id=eq.${telegramId}`, {
-                    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` },
-                    signal: controller.signal
+                    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
                 });
-                clearTimeout(timeoutId);
-                if (!response.ok) throw new Error("Cloud bad response");
                 const data = await response.json();
                 if (data && data.length > 0) {
-                    state = data[0].game_state || createDefaultState();
-                    quests = data[0].quests_state || [];
-                    diaryNotes = data[0].diary_state || {};
-                } else {
-                    loadLocally();
+                    if (data[0].pin == localPin) {
+                        state = data[0].game_state || createDefaultState();
+                        quests = data[0].quests_state || [];
+                        diaryNotes = data[0].diary_state || {};
+                    }
                 }
-            } catch(e) {
-                console.warn("Аварийное переключение на локальный режим:", e.message);
-                loadLocally();
-            }
+            } catch(e) { console.warn("Сеть недоступна, работаем локально."); }
             hideSplash(); updateUI();
         }
 
         function loadLocally() {
             try {
-                state = JSON.parse(localStorage.getItem('rpg_glass_v2.0_state')) || createDefaultState();
-                diaryNotes = JSON.parse(localStorage.getItem('circle_lf_diary_v1')) || {};
-                quests = JSON.parse(localStorage.getItem('rpg_glass_v2.0_quests')) || [];
+                const savedState = localStorage.getItem('rpg_glass_v2.0_state');
+                if (savedState) state = JSON.parse(savedState);
+                else state = createDefaultState();
+                
+                const savedDiary = localStorage.getItem('circle_lf_diary_v1');
+                if (savedDiary) diaryNotes = JSON.parse(savedDiary);
+
+                const savedQuests = localStorage.getItem('rpg_glass_v2.0_quests');
+                if (savedQuests) quests = JSON.parse(savedQuests);
             } catch(e) { state = createDefaultState(); }
         }
 
@@ -464,35 +545,25 @@
                 await fetch(`${SUPABASE_URL}/rest/v1/user_progress`, {
                     method: "POST",
                     headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
-                    body: JSON.stringify({ telegram_id: telegramId, game_state: state, quests_state: quests, diary_state: diaryNotes, updated_at: new Date().toISOString() })
+                    body: JSON.stringify({ telegram_id: telegramId, pin: localPin, game_state: state, quests_state: quests, diary_state: diaryNotes, updated_at: new Date().toISOString() })
                 });
-            } catch(e) { console.error("Ошибка сохранения:", e); }
+            } catch(e) { console.error("Ошибка синхронизации:", e); }
         }
 
-        // ФУНКЦИЯ ДВОЙНОГО ПОДТВЕРЖДЕНИЯ ПОЛНОГО СБРОСА
         async function requestHardReset() {
-            let check = prompt("🚨 ВНИМАНИЕ: Это действие безвозвратно сотрет все ваши уровни, квесты и дневники на всех устройствах!\n\nДля подтверждения введите слово УДАЛИТЬ большими буквами:");
+            let check = prompt("🚨 ВНИМАНИЕ: Это действие безвозвратно сотрет прогресс и сбросит ПИН!\n\nДля подтверждения введите слово УДАЛИТЬ:");
             if (check === "УДАЛИТЬ") {
-                // 1. Очищаем локальную память
-                localStorage.removeItem('rpg_glass_v2.0_state');
-                localStorage.removeItem('rpg_glass_v2.0_quests');
-                localStorage.removeItem('circle_lf_diary_v1');
-                localStorage.removeItem('circle_lf_tg_id');
-
-                // 2. Стираем строчку из облака Supabase, если оно подключено
                 if (isCloudEnabled()) {
                     try {
                         await fetch(`${SUPABASE_URL}/rest/v1/user_progress?telegram_id=eq.${telegramId}`, {
                             method: "DELETE",
                             headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
                         });
-                    } catch(e) { console.error("Ошибка удаления строки из облака:", e); }
+                    } catch(e) {}
                 }
-
-                alert("Все данные успешно стерты. Приложение перезапускается.");
+                localStorage.clear();
+                alert("Данные стерты.");
                 location.reload();
-            } else {
-                alert("Сброс отменен. Кодовое слово введено неверно.");
             }
         }
 
@@ -504,11 +575,11 @@
             { id: 1, icon: "⚡", title: "Разгон набран", desc: "Выполните суммарно 5 любых задач" },
             { id: 2, icon: "🔥", title: "Машина фокуса", desc: "Выполните суммарно 25 задач" },
             { id: 3, icon: "💎", title: "Эрудит", desc: "Выполните 10 стандартных целей" },
-            { id: 4, icon: "⚔️", title: "Сокрушитель преград", desc: "Одолейте 3 тяжелых вызова (+100 XP)" },
-            { id: 5, icon: "🛡️", title: "Герой титана", desc: "Одолейте 10 тяжелых вызовов" },
+            { id: 4, icon: "⚔️", title: "Сокрушитель преград", desc: "Одолейте 3 трудные задачи (+100 XP)" },
+            { id: 5, icon: "🛡️", title: "Герой титана", desc: "Одолейте 10 трудных задач" },
             { id: 6, icon: "🌟", title: "Новая ступень", desc: "Прокачайте любую сферу до 3 уровня" },
             { id: 7, icon: "🌌", title: "Мастер грани", desc: "Прокачайте любую сферу до 5 уровня" },
-            { id: 8, icon: "🤝", title: "Баланс стихий", desc: "Поднимите абсолютно все 4 сферы до 2 уровня" },
+            { id: 8, icon: "🤝", title: "Баланс стихий", desc: "Поднимите абсолютно все сферы до 2 уровня" },
             { id: 9, icon: "👑", title: "Укрепление ядра", desc: "Прокачайте общий ранг аккаунта до 5 уровня" },
             { id: 10, icon: "🔮", title: "Высший разум", desc: "Прокачайте общий ранг аккаунта до 10 уровня" },
             { id: 11, icon: "🎨", title: "Свой путь", desc: "Переименовайте любую стандартную сферу прокачки" }
@@ -530,15 +601,30 @@
 
         function saveSphereNames() {
             let changed = false;
-            for(let i=0; i<4; i++) {
-                let oldName = state.spheres[i].name;
-                let newName = document.getElementById(`sphere-name-${i}`).value;
-                if(oldName !== newName) { state.spheres[i].name = newName; changed = true; }
-            }
+            state.spheres.forEach((sphere) => {
+                let inputEl = document.getElementById(`sphere-name-${sphere.id}`);
+                if (inputEl) {
+                    let newName = inputEl.value.trim();
+                    if (sphere.name !== newName && newName !== "") {
+                        sphere.name = newName;
+                        changed = true;
+                    }
+                }
+            });
             if(changed) triggerAchievement(11); saveToCloud(); updateDropdowns();
         }
 
-        function updateDropdowns() { for(let i=0; i<4; i++) { const el = document.getElementById(`opt-${i}`); if (el) el.innerText = state.spheres[i].name; } }
+        function updateDropdowns() {
+            const select = document.getElementById('quest-sphere');
+            if (!select) return;
+            const currentVal = select.value;
+            select.innerHTML = '';
+            state.spheres.forEach(sphere => {
+                select.innerHTML += `<option value="${sphere.id}">${sphere.name}</option>`;
+            });
+            if (currentVal !== "" && [...select.options].some(o => o.value === currentVal)) select.value = currentVal;
+        }
+
         function setCircleProgress(elementId, radius, percent) { const circle = document.getElementById(elementId); if (!circle) return; const circumference = 2 * Math.PI * radius; circle.style.strokeDasharray = circumference + ' ' + circumference; circle.style.strokeDashoffset = circumference - (percent / 100 * circumference); }
         
         function renderCalendar() {
@@ -573,9 +659,9 @@
             if (state.hardCompleted >= 3) triggerAchievement(4);
             if (state.hardCompleted >= 10) triggerAchievement(5);
             let lvls = state.spheres.map(s => s.level);
-            if (Math.max(...lvls) >= 3) triggerAchievement(6);
-            if (Math.max(...lvls) >= 5) triggerAchievement(7);
-            if (Math.min(...lvls) >= 2) triggerAchievement(8);
+            if (lvls.length > 0 && Math.max(...lvls) >= 3) triggerAchievement(6);
+            if (lvls.length > 0 && Math.max(...lvls) >= 5) triggerAchievement(7);
+            if (lvls.length >= 4 && Math.min(...lvls) >= 2) triggerAchievement(8);
             if (state.mainLevel >= 5) triggerAchievement(9);
             if (state.mainLevel >= 10) triggerAchievement(10);
         }
@@ -588,10 +674,41 @@
             });
         }
 
+        function renderSpheresUI() {
+            const container = document.getElementById('spheres-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            state.spheres.forEach(sphere => {
+                container.innerHTML += `
+                    <div class="sphere-card">
+                        <div class="sphere-circle-container">
+                            <svg class="progress-ring" width="70" height="70">
+                                <circle class="circle-bg" cx="35" cy="35" r="32"/>
+                                <circle class="sphere-circle-progress" id="sphere-circle-${sphere.id}" cx="35" cy="35" r="32"/>
+                            </svg>
+                            <div class="sphere-level" id="sphere-lvl-${sphere.id}">${sphere.level}</div>
+                        </div>
+                        <input type="text" class="sphere-name-input" id="sphere-name-${sphere.id}" onchange="saveSphereNames()" value="${sphere.name}">
+                        <div class="sphere-xp-text" id="sphere-xp-${sphere.id}">${sphere.xp}/${sphere.nextXp} XP</div>
+                    </div>
+                `;
+            });
+        }
+
+        function promptNewSphere() {
+            let name = prompt("Введите название нового круга опыта:");
+            if (!name || name.trim() === "") return;
+
+            const newId = Date.now();
+            state.spheres.push({ id: newId, name: name.trim(), level: 0, xp: 0, nextXp: 100 });
+            saveToCloud();
+            updateUI();
+        }
+
         function updateUI() {
             if (!state || !state.spheres) state = createDefaultState();
 
-            // Отображаем красивое приветствие с никнеймом
             document.getElementById('profile-tag-label').innerText = "Профиль: " + (telegramId || "@user");
 
             document.getElementById('main-level').innerText = state.mainLevel;
@@ -603,12 +720,10 @@
             if(state.mainLevel >= 10) status = "Мастер линейки";
             document.getElementById('main-sphere-status').innerText = status;
 
-            state.spheres.forEach((sphere, i) => {
-                const nameInput = document.getElementById(`sphere-name-${i}`);
-                if (nameInput) nameInput.value = sphere.name;
-                document.getElementById(`sphere-lvl-${i}`).innerText = sphere.level;
-                document.getElementById(`sphere-xp-${i}`).innerText = sphere.xp + "/" + sphere.nextXp + " XP";
-                setCircleProgress(`sphere-circle-${i}`, 32, (sphere.xp / sphere.nextXp) * 100);
+            renderSpheresUI();
+            
+            state.spheres.forEach(sphere => {
+                setCircleProgress(`sphere-circle-${sphere.id}`, 32, (sphere.xp / sphere.nextXp) * 100);
             });
 
             updateDropdowns(); evaluateAchievements();
@@ -643,6 +758,8 @@
             quests.forEach((quest, index) => {
                 if (quest.date !== selectedDateStr) return;
                 let rewards = quest.difficulty === 'easy' ? "+20 XP" : quest.difficulty === 'hard' ? "+100 XP" : "+50 XP";
+                const linkedSphere = state.spheres.find(s => s.id === quest.sphereId);
+                const sphereName = linkedSphere ? linkedSphere.name : "Сфера";
                 
                 if(!quest.completed) {
                     list.innerHTML += `
@@ -650,7 +767,7 @@
                             <div>
                                 <div class="quest-title">${quest.text}</div>
                                 <div>
-                                    <span class="quest-tag">${state.spheres[quest.sphereId]?.name || "Сфера"}</span>
+                                    <span class="quest-tag">${sphereName}</span>
                                     <span style="font-size:0.75rem; color: var(--text-muted); margin-left: 6px;">${rewards}</span>
                                 </div>
                             </div>
@@ -668,7 +785,7 @@
                             <div>
                                 <div class="quest-title" style="text-decoration: line-through; color: var(--text-muted);">${quest.text}</div>
                                 <div>
-                                    <span class="quest-tag">${state.spheres[quest.sphereId]?.name || "Сфера"}</span>
+                                    <span class="quest-tag">${sphereName}</span>
                                     <span style="font-size:0.75rem; color: var(--text-muted); margin-left: 6px;">${rewards}</span>
                                 </div>
                             </div>
@@ -682,7 +799,9 @@
 
         function addQuest() {
             const input = document.getElementById('quest-input');
-            const sphereId = parseInt(document.getElementById('quest-sphere').value);
+            const selectEl = document.getElementById('quest-sphere');
+            if (!selectEl || selectEl.value === "") return;
+            const sphereId = parseInt(selectEl.value);
             const difficulty = document.getElementById('quest-difficulty').value;
             if (!input || !input.value.trim()) return;
 
@@ -709,10 +828,13 @@
                 if(quest.difficulty === 'hard') state.hardCompleted++;
                 state.totalCompleted++;
 
-                let ts = state.spheres[quest.sphereId];
-                ts.xp += xpReward;
+                let ts = state.spheres.find(s => s.id === quest.sphereId);
                 let leveledUpSphere = false;
-                if (ts.xp >= ts.nextXp) { ts.xp -= ts.nextXp; ts.level++; ts.nextXp = Math.floor(ts.nextXp * 1.25); leveledUpSphere = true; }
+                
+                if (ts) {
+                    ts.xp += xpReward;
+                    if (ts.xp >= ts.nextXp) { ts.xp -= ts.nextXp; ts.level++; ts.nextXp = Math.floor(ts.nextXp * 1.25); leveledUpSphere = true; }
+                }
 
                 let mainReward = Math.floor(xpReward * 0.7);
                 state.mainXp += mainReward;
@@ -720,7 +842,7 @@
                 if (state.mainXp >= state.mainNextLevelXp) { state.mainXp -= state.mainNextLevelXp; state.mainLevel++; state.mainNextLevelXp = Math.floor(state.mainNextLevelXp * 1.35); leveledUpMain = true; }
 
                 if (leveledUpMain) { showModal("ГЛОБАЛЬНЫЙ ЛЕВЕЛАП!", "Общий ранг вырос до " + state.mainLevel + " уровня."); }
-                else if (leveledUpSphere) { showModal("Сфера прокачана!", `"${ts.name}" развилась до ${ts.level} уровня!`); }
+                else if (leveledUpSphere && ts) { showModal("Сфера прокачана!", `"${ts.name}" развилась до ${ts.level} уровня!`); }
 
                 quest.completed = true;
                 saveToCloud(); updateUI();
@@ -737,10 +859,12 @@
             if(quest.difficulty === 'hard' && state.hardCompleted > 0) state.hardCompleted--;
             if(state.totalCompleted > 0) state.totalCompleted--;
 
-            let ts = state.spheres[quest.sphereId];
-            ts.xp -= xpReward;
-            if (ts.xp < 0 && ts.level > 0) { ts.level--; ts.nextXp = Math.ceil(ts.nextXp / 1.25); ts.xp = ts.nextXp + ts.xp; } 
-            else if (ts.xp < 0) { ts.xp = 0; }
+            let ts = state.spheres.find(s => s.id === quest.sphereId);
+            if (ts) {
+                ts.xp -= xpReward;
+                if (ts.xp < 0 && ts.level > 0) { ts.level--; ts.nextXp = Math.ceil(ts.nextXp / 1.25); ts.xp = ts.nextXp + ts.xp; } 
+                else if (ts.xp < 0) { ts.xp = 0; }
+            }
 
             let mainReward = Math.floor(xpReward * 0.7);
             state.mainXp -= mainReward;
